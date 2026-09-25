@@ -154,9 +154,8 @@ def cryptic_benchmark_frames(system: str) -> tuple[str, list[int], dict]:
         )
     requested = len(ranges[system].metric_positions)
     print(
-        f"  metric region: {len(positions)} of {requested} positions resolved in BOTH deposited "
-        f"chains ({row['apo_pdb_id']}_{row['apo_auth_chain']} / "
-        f"{row['holo_pdb_id']}_{row['holo_auth_chain']})"
+        f"metric region: {len(positions)} of {requested} positions resolved in both "
+        "deposited chains"
     )
     return sequence, [position - 1 for position in positions], frames
 
@@ -264,19 +263,14 @@ def main() -> int:
         + "\n".join(sequence[i : i + 60] for i in range(0, len(sequence), 60))
         + "\n"
     )
-    print(f"wrote {fasta}  ({len(sequence)} residues)")
+    print(f"wrote {fasta}")
 
     if entry is not None:
         indices, frames = metric_frame(entry, states)
     for state in states:
         target = out / f"{arguments.system}_{state}.pdb"
-        count = write_pdb(target, frames[state], indices, sequence)
-        span = (
-            "the whole chain"
-            if count == len(sequence)
-            else f"{count} of {len(sequence)} residues, this benchmark's metric region"
-        )
-        print(f"wrote {target}  ({span}; " f"steer toward it with {ARM_FOR_STATE[state]})")
+        write_pdb(target, frames[state], indices, sequence)
+        print(f"wrote {target}  (target of {ARM_FOR_STATE[state]})")
 
     if pool is not None:
         names = [e["sequence_id"] for e in json.loads((DATA / pool).read_text())["entries"]]

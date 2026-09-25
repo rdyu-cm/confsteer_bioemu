@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import warnings
 from dataclasses import replace
 from pathlib import Path
 
@@ -18,12 +19,24 @@ from pathlib import Path
 # any result. `setdefault`, so a user who has chosen otherwise keeps their choice. Must precede any
 # import that could initialise JAX.
 os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
+# TensorFlow, imported by that AlphaFold2, prints INFO banners (oneDNN, CPU features) on every run.
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+from sae_bioemu.runtime_env import use_importable_matplotlib_backend  # noqa: E402
+
+use_importable_matplotlib_backend()
+
+# BioEmu asks for deterministic algorithms once per generation, and PyTorch answers with the same
+# CuBLAS warning every time -- hundreds of identical paragraphs in a run with several draws, none of
+# which the user can act on. Silenced here rather than by setting CUBLAS_WORKSPACE_CONFIG, which
+# would change how the kernels are chosen and so could change the numbers.
+warnings.filterwarnings("ignore", message="Deterministic behavior was enabled")
 
 import torch  # noqa: E402
-import typer
+import typer  # noqa: E402
 
-from sae_bioemu.bioemu.extractor import BioEmuRuntimeActivationSampler, read_fasta
-from sae_bioemu.core.config import ProjectConfig
+from sae_bioemu.bioemu.extractor import BioEmuRuntimeActivationSampler, read_fasta  # noqa: E402
+from sae_bioemu.core.config import ProjectConfig  # noqa: E402
 
 app = typer.Typer(help="Run the shipped sparse autoencoder and steering adapters on BioEmu.")
 
@@ -87,9 +100,7 @@ def _resolve_seed(requested: int | None) -> int:
     if requested is not None:
         return int(requested)
     fresh = time.time_ns() % (2**31 - 1)
-    typer.echo(
-        f"seed             {fresh}   (none given; pass --seed {fresh} to reproduce this run)"
-    )
+    typer.echo(f"seed {fresh} (pass --seed {fresh} to reproduce)")
     return fresh
 
 
@@ -117,34 +128,19 @@ def sae_encode(
     sequences: int = 1,
     out_dir: Path | None = None,
     seed: int | None = None,
-    top_features: int = 10,
     device: str = "",
 ) -> None:
     """Encode REAL BioEmu activations with the base SAE. Needs a GPU and network.
 
-    Generates BioEmu activations for real sequences at the trained layer, encodes them, and
-    reports reconstruction error on the distribution the SAE was trained on -- real activations,
-    not synthetic input, which has no low-dimensional structure to recover and would put the
-    relative L2 near 1 whatever the model had learned.
+    Generates BioEmu activations for ``--sequences`` proteins at the trained layer, encodes them,
+    writes the sparse latents to ``--out-dir``, and reports reconstruction error on the
+    distribution the SAE was trained on -- real activations, not synthetic input, which has no
+    low-dimensional structure to recover and would put the relative L2 near 1 whatever the model
+    had learned.
 
-    **THE NUMBERS DESCRIBE ONE DRAW.** They are computed on the activations of ``--sequences``
-    proteins generated at ``--seed`` (default: one sequence, a fresh seed that is printed), so they
-    are reproducible for a given pair and move with either. One protein at one seed is an illustration of the
-    model working, not a measurement of its reconstruction quality.
-
-    Interpreting the numbers:
-
-    ``relative L2``     reconstruction error on real activations. On Gaussian noise this is
-                        necessarily near or above 1 -- random input has no low-dimensional
-                        structure. A value well below that is the whole claim of the model.
-    ``active latents``  must equal ``top_k`` exactly; TopK sparsity is architectural.
-    ``latents used``    distinct latents firing anywhere in the sample. Far below ``n_latents``
-                        means most of the dictionary is unused **on this small sample**, which is
-                        expected and is not a dead-feature measurement.
-
-    This describes reconstruction, not interpretability. It makes no claim that any individual
-    latent corresponds to a structural concept; that requires the InterPro evaluation with
-    sequence-grouped folds.
+    The error describes ONE draw, at ``--seed`` (default: a fresh seed, which is printed), so it
+    moves with either. It describes reconstruction, not interpretability: it makes no claim that
+    any individual latent corresponds to a structural concept.
 
     Costs a ColabFold MMseqs2 query per sequence on first use, then a BioEmu generation pass.
     """
@@ -171,17 +167,16 @@ def sae_encode(
 
     model = TimeConditionedTopKSAE.load_checkpoint(resolved)
     model.eval()
-    typer.echo(f"checkpoint       {resolved}")
-    typer.echo(f"sequences        {len(records)} from {fasta_path.name}")
-    typer.echo(f"layer            {project.trace.target_module}")
-    typer.echo("generating BioEmu activations (first run downloads weights and queries MMseqs2)...")
+    base_seed = _resolve_seed(seed)
+    plural = "" if len(records) == 1 else "s"
+    typer.echo(f"encoding {len(records)} protein{plural} with BioEmu...")
 
     sampler = BioEmuRuntimeActivationSampler(
         # save_final_structures=False: the shipped config sets it True for a TRAINING run, which
-        # writes structures through a store. Neither of these commands has one -- this one reports,
-        # and steer-apply persists through SteeringStructureWriter -- and the sampler refuses
-        # save_final_structures=True with structures_dir=None rather than generating and dropping
-        # every structure. Turning the flag off here says the draws are consumed in-process.
+        # writes structures through a store. Neither of these commands has one -- this one reports
+        # and writes latents -- and the sampler refuses save_final_structures=True with
+        # structures_dir=None rather than generating and dropping every structure. Turning the flag
+        # off here says the draws are consumed in-process.
         replace(project.trace, save_final_structures=False),
         cache_embeds_dir=project.training.cache_embeds_dir,
         structures_dir=None,
@@ -191,43 +186,32 @@ def sae_encode(
         # without ever touching the GPU the README says they need.
         device=_resolve_device(device),
     )
-    record = sampler.sample(records, seed=_resolve_seed(seed))
+    record = sampler.sample(records, seed=base_seed)
     activations, timesteps = record.activations, record.timesteps
     device = next(model.parameters()).device
     with torch.no_grad():
         output = model(activations.to(device).float(), timesteps.to(device).float())
     latents, reconstruction = output.latents, output.reconstruction
 
-    active = latents.count_nonzero(dim=-1)
     error = float(
         (reconstruction - activations.to(device)).norm(dim=-1).mean()
         / activations.to(device).norm(dim=-1).mean()
     )
-    used = int((latents.abs().sum(dim=0) > 0).sum())
-    typer.echo("")
-    typer.echo(
-        f"tokens           {activations.shape[0]} residue-timestep rows, dim {activations.shape[1]}"
+    counts = (
+        f"{len(records)} protein{plural}, {activations.shape[0]} residue-timestep rows, "
+        f"top {model.config.top_k} of {model.config.n_latents} latents per row"
     )
-    typer.echo(f"timesteps        {float(timesteps.min()):.4f} .. {float(timesteps.max()):.4f}")
-    typer.echo(
-        f"active latents   {int(active.min())}..{int(active.max())} (top_k={model.config.top_k})"
-    )
-    typer.echo(f"latents used     {used} of {model.config.n_latents} distinct, on this sample")
-    typer.echo(f"relative L2      {error:.4f}   on REAL activations")
-
-    totals = latents.abs().sum(dim=0)
-    order = torch.argsort(totals, descending=True)[:top_features]
-    typer.echo("")
-    typer.echo(f"{'latent':>8} {'total activation':>18} {'tokens firing':>15}")
-    for index in order.tolist():
-        firing = int((latents[:, index] != 0).sum())
-        typer.echo(f"{index:>8} {float(totals[index]):>18.3f} {firing:>15}")
-
-    if out_dir is not None:
-        _write_latents(out_dir if out_dir.is_absolute() else root / out_dir, record, latents, model)
+    if out_dir is None:
+        typer.echo(counts)
+    else:
+        path = _write_latents(
+            out_dir if out_dir.is_absolute() else root / out_dir, record, latents, model
+        )
+        typer.echo(f"wrote {out_dir / path.name}: {counts}")
+    typer.echo(f"reconstruction error (relative L2): {error:.3f}")
 
 
-def _write_latents(destination: Path, record: object, latents: object, model: object) -> None:
+def _write_latents(destination: Path, record: object, latents: object, model: object) -> Path:
     """Write the SAE latents SPARSELY, keyed to the residue and timestep each row came from.
 
     These activations are the feature values every association in the paper was computed on, so
@@ -259,13 +243,7 @@ def _write_latents(destination: Path, record: object, latents: object, model: ob
     }
     path = destination / "sae_latents.npz"
     numpy.savez_compressed(path, **payload)
-    rows, k = payload["latent_values"].shape
-    typer.echo("")
-    typer.echo(f"latents          {path}")
-    typer.echo(
-        f"                 {rows} rows x {k} nonzeros of {model.config.n_latents}; each row "
-        "carries its sequence_id, residue_index and timestep"
-    )
+    return path
 
 
 def _reference_backbone(path: Path, sequence: str) -> tuple[list[int], object]:
@@ -364,7 +342,11 @@ def _resolve_references(reference: Path | None, root: Path, chosen: list) -> dic
                     "A reference directory is matched by sequence id, as export_system.py writes it"
                 )
             if missing:
-                typer.echo(f"NOTE: no reference in {located.name} for {missing}; those are steered")
+                shown = ", ".join(missing[:3]) + (", ..." if len(missing) > 3 else "")
+                typer.echo(
+                    f"NOTE: {len(missing)} of {len(chosen)} proteins have no reference in "
+                    f"{located.name} ({shown}); they are steered without one"
+                )
         elif len(chosen) > 1:
             raise typer.BadParameter(
                 f"--reference {located.name} is one structure but {len(chosen)} proteins were "
@@ -383,15 +365,15 @@ def _score_against_reference(
     unsteered: object | None,
     steered: object,
 ) -> dict[str, float]:
-    """Report each arm's N/CA/C/O RMSD to a target conformer, over the residues it covers.
+    """Return each arm's N/CA/C/O RMSD to a target conformer, over the residues it covers.
 
     THE SAME ATOM SET AND THE SAME SUPERPOSITION THE BENCHMARKS USE, so a number here and a number
     from ``run_benchmark.py`` mean the same thing. Both arms are backbone-complete: the steered
     structure carries its frames on its batch and the control is generated through
     ``generate_unsteered_frames``, whose positions are byte-identical to the plain call's.
 
-    ``unsteered`` may be ``None`` (``--no-control``), in which case the steered distance is
-    reported alone and says so -- it cannot show what the intervention did.
+    ``unsteered`` may be ``None`` (``--no-control``), in which case only the steered distance is
+    returned -- alone it cannot show what the intervention did.
     """
     if reference is None:
         return {}
@@ -406,14 +388,6 @@ def _score_against_reference(
     wanted, target_array = _reference_backbone(path, sequence)
     target = torch.as_tensor(target_array, dtype=torch.float64).reshape(-1, 3)
 
-    typer.echo("")
-    span = (
-        "the whole chain"
-        if len(wanted) == len(sequence)
-        else f"{len(wanted)} of {len(sequence)} residues"
-    )
-    typer.echo(f"{'arm':>12} {f'N/CA/C/O RMSD to {path.name} (A)':>40}")
-    typer.echo(f"{'':>12} {f'over {span}':>40}")
     values: dict[str, float] = {}
     pairs = [("steered", steered)]
     if unsteered is not None:
@@ -427,20 +401,53 @@ def _score_against_reference(
             )
         selected = torch.as_tensor(array[wanted], dtype=torch.float64).reshape(-1, 3)
         values[label] = float(aligned_rmsd(selected, target).reshape(()))
-        typer.echo(f"{label:>12} {values[label]:>40.3f}")
-    if "unsteered" in values:
-        delta = values["steered"] - values["unsteered"]
-        typer.echo(f"{'change':>12} {delta:>+40.3f}")
-        typer.echo(
-            "negative = the intervention moved this draw CLOSER to the reference. One draw: an "
-            "illustration, not an effect size."
-        )
-    else:
-        typer.echo(
-            "no unsteered arm was generated (--no-control), so this distance stands alone: "
-            "whether the adapter moved the draw toward the reference cannot be read from it."
-        )
     return values
+
+
+def _value_columns(reference: bool, control: bool) -> str:
+    """The one line naming what the per-draw ``off``/``on`` numbers are."""
+    what = "N/CA/C/O RMSD (A) to the reference" if reference else "radius of gyration (A)"
+    arms = "off = unsteered, on = steered" if control else "on = steered"
+    return f"{what}: {arms}"
+
+
+def _structure_filename(sequence_id: str, seed: int, arm: str) -> str:
+    """The file name one arm of one draw is written under.
+
+    The sequence id comes from a FASTA header, which may hold a separator or whitespace; either
+    would put the file somewhere other than the output directory, or split one draw's name across
+    two words. Replaced rather than rejected, so an ordinary FASTA is not refused for its headers.
+    """
+    safe = "".join(
+        "_" if character.isspace() or character in (os.sep, "/") else character
+        for character in sequence_id
+    )
+    return f"{safe}_seed{seed}_{arm}.pdb"
+
+
+def _write_backbone_pdb(
+    path: Path, positions_nanometers: object, node_orientations: object, sequence: str
+) -> None:
+    """Write one arm as a backbone PDB, the way the runtime structure store writes its own.
+
+    BioEmu's coordinates are nanometres and its PDB writer takes Angstrom, so the positions are
+    scaled and centred exactly as ``extractor.py`` does before handing them over -- a factor of ten
+    here would produce a file that opens, renders, and measures nothing. Written to a temporary
+    name and moved into place, so an interrupted run leaves no half-written structure behind.
+    """
+    import torch
+    from bioemu.convert_chemgraph import _write_pdb
+
+    residues = len(sequence)
+    pos = torch.as_tensor(positions_nanometers).detach().cpu().reshape(residues, 3).float() * 10.0
+    pos = pos - pos.mean(dim=0, keepdim=True)
+    orientations = torch.as_tensor(node_orientations).detach().cpu().reshape(residues, 3, 3).float()
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        _write_pdb(pos=pos, node_orientations=orientations, sequence=sequence, filename=temporary)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 @app.command()
@@ -473,9 +480,9 @@ def steer_apply(
     single-direction -- each learned one level, and the opposite is a dose it never saw -- so the
     default is that level and asking for another says so.
 
-    ``--reference`` scores each arm's N/CA/C/O RMSD to a target conformer and writes it to
-    ``reference_rmsd.csv`` beside the structures. Radius of gyration is reported for both arms
-    because it needs no reference.
+    Both arms are written to ``--out-dir`` as backbone PDBs, ``<id>_seed<seed>_on.pdb`` and
+    ``_off.pdb``. ``--reference`` additionally scores each arm's N/CA/C/O RMSD to a target
+    conformer, printed per draw and appended to ``reference_rmsd.csv`` beside the structures.
 
     One sequence at one level and one seed is an anecdote, not an effect size: the sign may not
     match on a single draw, and nothing here is corrected for sampling variation.
@@ -483,13 +490,10 @@ def steer_apply(
     import torch
 
     from sae_bioemu.bioemu.steering import steering_site_from_record
+    from sae_bioemu.bioemu.steering_properties import padded_node_orientations
     from sae_bioemu.core.paths import repository_root
+    from sae_bioemu.cryptic_rmsd.frames import batched_backbone_atoms
     from sae_bioemu.steering.adapter_io import load_adapter
-    from sae_bioemu.steering.evaluation_structures import (
-        ADAPTER_OFF_ARM,
-        ADAPTER_ON_ARM,
-        SteeringStructureWriter,
-    )
     from sae_bioemu.steering.rg_calibration import radius_of_gyration_angstrom
 
     root = repository_root()
@@ -524,11 +528,9 @@ def steer_apply(
     else:
         chosen = list(records[:sequences])
 
-    references = _resolve_references(reference, root, chosen)
+    if draws < 1:
+        raise typer.BadParameter("--draws must be at least 1")
 
-    typer.echo(f"adapter          {resolved}")
-    typer.echo(f"proteins         {len(chosen)} of {len(records)} in {fasta_path.name}")
-    typer.echo(f"site             {site.module_path} score call {site.score_calls}")
     # DEFAULT THE LEVEL TO WHAT THIS ADAPTER WAS TRAINED AT. The six benchmark adapters are
     # single-direction: each learned one level, and asking for the other is a dose it never saw.
     # The level-conditioned Rg adapter has a range, so it keeps the +1.0 the documentation uses.
@@ -553,23 +555,30 @@ def steer_apply(
             f"NOTE: {resolved.stem} was trained only at level {float(trained[0]):+.1f}; "
             f"{float(level):+.1f} is a dose it never saw."
         )
-    typer.echo(f"adapter          {resolved.stem}")
+
+    destination = out_dir if out_dir.is_absolute() else root / out_dir
+    destination.mkdir(parents=True, exist_ok=True)
     typer.echo(
-        f"level            {level:+.2f}   {draws} draw(s) per protein"
-        + ("   shared by both arms" if control else "   steered arm only")
+        f"{resolved.stem}: {len(chosen)} protein{'' if len(chosen) == 1 else 's'} x "
+        f"{draws} draw{'' if draws == 1 else 's'} -> {out_dir}"
     )
-    typer.echo(
-        "generating both arms through BioEmu..."
-        if control
-        else "generating the steered arm through BioEmu (--no-control)..."
-    )
+    references = _resolve_references(reference, root, chosen)
+    # WHICH PROPERTY THIS ADAPTER STEERS, from the checkpoint rather than from its file name: only
+    # the radius-of-gyration adapter has a value worth printing without a reference, and a renamed
+    # copy of any other one would otherwise be reported as though it steered the radius.
+    steers_rg = payload["adapter_config"].get("property_name") == "radius_of_gyration"
+    base_seed = _resolve_seed(seed)
+    if any(path is not None for path in references.values()):
+        typer.echo(_value_columns(reference=True, control=control))
+    elif steers_rg:
+        typer.echo(_value_columns(reference=False, control=control))
 
     sampler = BioEmuRuntimeActivationSampler(
         # save_final_structures=False: the shipped config sets it True for a TRAINING run, which
-        # writes structures through a store. Neither of these commands has one -- this one reports,
-        # and steer-apply persists through SteeringStructureWriter -- and the sampler refuses
-        # save_final_structures=True with structures_dir=None rather than generating and dropping
-        # every structure. Turning the flag off here says the draws are consumed in-process.
+        # writes structures through a store. Neither of these commands has one -- this one writes
+        # its own PDBs -- and the sampler refuses save_final_structures=True with
+        # structures_dir=None rather than generating and dropping every structure. Turning the flag
+        # off here says the draws are consumed in-process.
         replace(project.trace, save_final_structures=False),
         cache_embeds_dir=project.training.cache_embeds_dir,
         structures_dir=None,
@@ -579,30 +588,20 @@ def steer_apply(
         # without ever touching the GPU the README says they need.
         device=_resolve_device(device),
     )
-    if draws < 1:
-        raise typer.BadParameter("--draws must be at least 1")
-    base_seed = _resolve_seed(seed)
     draw_seeds = [base_seed + index for index in range(draws)]
-    for position, record in enumerate(chosen, start=1):
+    written = 0
+    wrote_csv = False
+    for record in chosen:
         reference_for_record = references[record.sequence_id]
-        typer.echo("")
-        typer.echo(
-            f"[{position}/{len(chosen)}] {record.sequence_id} "
-            f"({len(record.sequence)} residues)"
-            + (f"  reference {reference_for_record.name}" if reference_for_record else "")
-        )
         # DRAWS. Each draw has its own seed, base + index, and within a draw the steered and the
         # control structure SHARE it -- that is what keeps every pair matched while the draws differ.
-        for draw_number, seed in enumerate(draw_seeds, start=1):
-            if draws > 1:
-                typer.echo(f"  draw {draw_number}/{draws}  seed {seed}")
-            reference_scores: dict[str, float] = {}
+        for seed in draw_seeds:
             residue_mask = torch.ones(1, len(record.sequence), dtype=torch.bool)
             target = torch.tensor([float(level)])
 
             # BOTH ARMS BACKBONE-COMPLETE. generate_unsteered returns a bare C-alpha tensor; the _frames
-            # variant returns byte-identical positions PLUS the per-residue frames, which is what makes
-            # N/CA/C/O -- the atom set the benchmarks score on -- available for the control as well.
+            # variant returns byte-identical positions PLUS the per-residue frames, which is what lets the
+            # control be written as a PDB and scored over N/CA/C/O, the atom set the benchmarks use.
             unsteered_frames = (
                 sampler.generate_unsteered_frames(record, seed=seed) if control else None
             )
@@ -646,28 +645,15 @@ def steer_apply(
                     )
                 return float(radius_of_gyration_angstrom(array)[0])
 
-            # Name the shapes before consuming them: the two arms are produced by different code paths and
-            # a rank mismatch here is a shape bug, not a scientific result.
-            arms: list[tuple[str, object]] = [("steered", positions)]
-            if unsteered is not None:
-                arms.insert(0, ("unsteered", unsteered))
-            for label, value in arms:
-                shape = getattr(value, "shape", None)
-                typer.echo(
-                    f"  {label} positions shape: {tuple(shape) if shape is not None else type(value)}"
-                )
-            rg_on = rg("steered", positions)
-            rg_off = rg("unsteered", unsteered) if unsteered is not None else None
-            if reference_for_record is not None:
-                from sae_bioemu.bioemu.steering_properties import padded_node_orientations
-                from sae_bioemu.cryptic_rmsd.frames import batched_backbone_atoms
+            # The steered arm's frames sit on its batch, padded the same way its positions are.
+            orientations = padded_node_orientations(steered, [record])
+            residues = len(record.sequence)
 
-                members = [record]
+            values: dict[str, float] = {}
+            if reference_for_record is not None:
                 steered_backbone = (
                     batched_backbone_atoms(
-                        steered.coordinates.reshape(1, len(record.sequence), 3),
-                        padded_node_orientations(steered, members),
-                        [record.sequence],
+                        positions.reshape(1, residues, 3), orientations, [record.sequence]
                     )[0]
                     .detach()
                     .cpu()
@@ -676,103 +662,52 @@ def steer_apply(
                 if unsteered_frames is not None:
                     control_backbone = (
                         batched_backbone_atoms(
-                            unsteered_frames[0].reshape(1, len(record.sequence), 3),
-                            unsteered_frames[1].reshape(1, len(record.sequence), 3, 3),
+                            unsteered_frames[0].reshape(1, residues, 3),
+                            unsteered_frames[1].reshape(1, residues, 3, 3),
                             [record.sequence],
                         )[0]
                         .detach()
                         .cpu()
                     )
-                reference_scores = _score_against_reference(
+                values = _score_against_reference(
                     reference_for_record, root, record.sequence, control_backbone, steered_backbone
                 )
-            typer.echo("")
-            typer.echo(f"{'arm':>12} {'radius of gyration (A)':>24}")
-            if rg_off is not None:
-                typer.echo(f"{'unsteered':>12} {rg_off:>24.3f}")
-            typer.echo(f"{'steered':>12} {rg_on:>24.3f}")
-            if rg_off is not None:
-                typer.echo(f"{'difference':>12} {rg_on - rg_off:>+24.3f}")
-            else:
-                typer.echo(
-                    "no unsteered arm was generated (--no-control), so there is no difference to report: "
-                    "this radius of gyration is a number about one draw, not an effect of the adapter"
-                )
-            fraction = float(steered.residual_fraction.detach().mean())
-            typer.echo(f"{'budget used':>12} {fraction:>24.4f}   (fraction of rho_max)")
-
-            def residue_positions(label: str, tensor: object) -> torch.Tensor:
-                """Return one arm's coordinates as a ``[residues, 3]`` CPU tensor.
-
-                The arms are produced by different code paths and need not share a rank, so drop leading
-                singleton axes only. Collapsing a real structure or residue axis would silently persist
-                the coordinates of a different point set under this arm's name.
-                """
-                array = (
-                    tensor.detach().cpu() if hasattr(tensor, "detach") else torch.as_tensor(tensor)
-                )
-                while array.ndim > 2 and array.shape[0] == 1:
-                    array = array[0]
-                if array.ndim != 2 or array.shape[-1] != 3:
-                    raise typer.BadParameter(
-                        f"{label} positions have shape {tuple(array.shape)}, which is not (residues, 3)"
-                    )
-                return array
-
-            # Persist both arms through the same store the gated evaluation writes, so a demo structure and
-            # an evaluation structure are the same kind of object. Deliberately no PDB: only coordinates are
-            # produced, not node orientations, so these are not backbone-complete, and rendering the steered
-            # arm alone would present two arms that are not comparable artifacts. That decision, and the
-            # nanometre/angstrom bookkeeping, live in sae_bioemu.steering.evaluation_structures.
-            destination = out_dir if out_dir.is_absolute() else root / out_dir
-            writer = SteeringStructureWriter(destination)
-            # The writer is keyed on (sequence_id, seed, arm), so reusing a seed REPLACES that draw
-            # rather than adding one. Without --seed every run draws fresh seeds, so this only fires
-            # when a seed is given twice -- and then it is said, not discovered from a flat index.
-            written_arms = [(ADAPTER_ON_ARM, positions, rg_on)]
-            if unsteered is not None:
-                written_arms.insert(0, (ADAPTER_OFF_ARM, unsteered, rg_off))
-            already = {(record.sequence_id, seed, arm) for arm, _, _ in written_arms} & set(
-                writer._keys  # noqa: SLF001 - the writer exposes no public membership test
-            )
-            typer.echo("")
-            for arm, tensor, value in written_arms:
-                entry = writer.write(
-                    sequence_id=record.sequence_id,
-                    sequence=record.sequence,
-                    seed=seed,
-                    arm=arm,
-                    unit_index=0,
-                    visit=0,
-                    level=float(level),
-                    target=float(level),
-                    # The value IS the radius of gyration -- labelling it with the adapter's own
-                    # property (e.g. kinase_conformer_rmsd) put an Rg under an RMSD's name on disk.
-                    property_name="radius_of_gyration",
-                    property_value=value,
-                    positions_nanometers=residue_positions(arm, tensor),
-                )
-                typer.echo(f"{arm:>12}     {destination / entry.npz_path}")
-            typer.echo(f"{'index':>12}     {writer.index_path}")
-            if reference_scores:
                 _append_reference_scores(
                     destination / "reference_rmsd.csv",
                     record.sequence_id,
                     seed,
                     reference_for_record,
-                    reference_scores,
+                    values,
                 )
-            if already:
-                typer.echo("")
-                typer.echo(
-                    f"NOTE: seed {seed} for this sequence was already in the index, so this draw "
-                    "replaced an identical one. Runs without --seed draw fresh seeds and accumulate."
-                )
-            typer.echo("")
+                wrote_csv = True
+            elif steers_rg:
+                values = {"steered": rg("steered", positions)}
+                if unsteered is not None:
+                    values["unsteered"] = rg("unsteered", unsteered)
 
-    typer.echo("")
-    typer.echo("Each draw is one sample. This demonstrates the mechanism; it is NOT the published")
-    typer.echo("result -- scripts/run_benchmark.py reproduces the benchmarks.")
+            arms: list[tuple[str, object, object]] = [("on", positions, orientations)]
+            if unsteered_frames is not None:
+                arms.append(("off", unsteered_frames[0], unsteered_frames[1]))
+            for arm, arm_positions, arm_orientations in arms:
+                _write_backbone_pdb(
+                    destination / _structure_filename(record.sequence_id, seed, arm),
+                    arm_positions,
+                    arm_orientations,
+                    record.sequence,
+                )
+                written += 1
+
+            line = f"{record.sequence_id}  seed {seed}"
+            if "unsteered" in values:
+                line += f"  off {values['unsteered']:.3f}"
+            if "steered" in values:
+                line += f"  on {values['steered']:.3f}"
+            typer.echo(line)
+
+    typer.echo(
+        f"wrote {written} structure{'' if written == 1 else 's'} to {out_dir}"
+        + (" and reference_rmsd.csv" if wrote_csv else "")
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover - exercised as `python -m sae_bioemu.cli`

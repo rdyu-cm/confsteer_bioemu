@@ -35,9 +35,28 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import subprocess
 import sys
 from pathlib import Path
+
+from sae_bioemu.runtime_env import use_importable_matplotlib_backend
+
+# Every stage below runs as a child process and inherits this environment, so repair it once here.
+use_importable_matplotlib_backend()
+
+# ... and the same for BioEmu's CuBLAS determinism warning, which PyTorch repeats once per
+# generation. The children are separate interpreters, so the filter has to travel as an environment
+# variable rather than through warnings.filterwarnings. NOT CUBLAS_WORKSPACE_CONFIG: that changes
+# how the kernels are chosen and so could change the numbers.
+os.environ["PYTHONWARNINGS"] = ",".join(
+    value
+    for value in (
+        os.environ.get("PYTHONWARNINGS", ""),
+        "ignore:Deterministic behavior was enabled",
+    )
+    if value
+)
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 DATA = REPOSITORY / "data/benchmarks"
@@ -48,8 +67,10 @@ MODELS = REPOSITORY / "models"
 ARMS = {
     "cryptic_uncond_m1": ("cryptic", "apo"),
     "cryptic_uncond_p1": ("cryptic", "holo"),
-    "domain_motion_uncond_m1": ("domain_motion", "conformer nearer the unsteered ensemble"),
-    "domain_motion_uncond_p1": ("domain_motion", "conformer further from the unsteered ensemble"),
+    # Nearer and further are relative to the UNSTEERED ensemble, which is the order the arms were
+    # trained on and not the deposited one.
+    "domain_motion_uncond_m1": ("domain_motion", "nearer conformer"),
+    "domain_motion_uncond_p1": ("domain_motion", "further conformer"),
     "kinase_uncond_m1": ("kinase", "DFG-in"),
     "kinase_uncond_p1": ("kinase", "DFG-out"),
 }
@@ -67,30 +88,56 @@ CRYPTIC_SCORED_PANEL = 32
 MIN_PAIRED_DRAWS = 5
 
 
-def run(command: list[str], label: str, partial_is_expected: bool = False) -> None:
-    """Run one stage, refusing on failure.
+def here(path: Path) -> str:
+    """A path as the reader would type it: relative to the working directory where it can be."""
+    try:
+        return str(path.resolve().relative_to(Path.cwd()))
+    except ValueError:
+        return str(path)
+
+
+def run(
+    command: list[str],
+    label: str,
+    log: Path,
+    partial_is_expected: bool = False,
+    show_log: bool = False,
+) -> None:
+    """Run one stage into its own log file, printing one line and refusing on failure.
+
+    A stage's own output is a scorer table, a progress stream or a refusal paragraph, and hours of
+    it scrolls past whatever the run actually concluded. It goes to ``log`` instead, which stays for
+    reading afterwards, and the tail is printed when the stage fails -- which is when it is wanted.
+    ``show_log`` names the file up front for the stages long enough to want watching.
 
     ``partial_is_expected`` covers the ONE case where a nonzero exit is the right answer: the
     scorers exit 1 when the population is restricted, because a rate over a subset is a different
     denominator wearing the panel's name. A run limited by ``--systems`` is exactly that, so the
-    exit is reported as the incomplete result it is rather than as a failure -- otherwise the
-    command this repository documents always ends in REFUSING and looks broken.
+    exit is not a failure -- otherwise the command this repository documents always ends in
+    REFUSING and looks broken.
     """
-    print(f"\n=== {label}\n    {' '.join(command)}", flush=True)
-    result = subprocess.run(command, cwd=REPOSITORY)
-    if result.returncode == 0:
+    log.parent.mkdir(parents=True, exist_ok=True)
+    print(f"{label}{f' (log: {here(log)})' if show_log else ''}...", end="", flush=True)
+    with log.open("w") as handle:
+        result = subprocess.run(command, cwd=REPOSITORY, stdout=handle, stderr=subprocess.STDOUT)
+    if result.returncode == 0 or (partial_is_expected and result.returncode == 1):
+        print(" done", flush=True)
         return
-    if partial_is_expected and result.returncode == 1:
-        print(
-            "\n(exited 1 because this run covers only the systems --systems asked for. That is "
-            "the scorer's contract, not a failure: the numbers above are a smoke test of the "
-            "pipeline, NOT a panel rate. Use --systems 0 for the reported population.)"
-        )
-        return
+    print(" FAILED", flush=True)
+    tail = log.read_text(errors="replace").splitlines()[-30:]
+    print("\n".join(tail), flush=True)
     raise SystemExit(f"REFUSING: {label} exited {result.returncode}")
 
 
-def confirm_coverage(sidecar: Path, expected: int, state: str, depth: int) -> None:
+def confirm_coverage(
+    sidecar: Path,
+    expected: int,
+    state: str,
+    depth: int,
+    arm: str = "",
+    reference: str = "",
+    panel: int = 0,
+) -> None:
     """Read back what was scored and refuse unless it covers the population that was asked for.
 
     The scorers exit 1 for two unrelated reasons: a restricted POPULATION, which is a real
@@ -102,8 +149,9 @@ def confirm_coverage(sidecar: Path, expected: int, state: str, depth: int) -> No
     """
     if not sidecar.is_file():
         raise SystemExit(
-            f"REFUSING: the scorer wrote no {sidecar.name}, so nothing was scored. Its output "
-            "above says why -- most often no draws were generated for the selected systems"
+            f"REFUSING: the scorer wrote no {sidecar.name}, so nothing was scored. Its log in "
+            f"{here(sidecar.parent.parent / 'logs')} says why -- most often no draws were "
+            "generated for the selected systems"
         )
     payload = json.loads(sidecar.read_text())
     # THE SIDECAR MUST BE THIS RUN'S. ``run`` treats exit 1 as an expected partial result, so a
@@ -147,11 +195,42 @@ def confirm_coverage(sidecar: Path, expected: int, state: str, depth: int) -> No
         tau = cell.get("tau_angstrom")
         if tau is None or (isinstance(tau, float) and math.isnan(tau)):
             continue  # the adaptive cell has no single threshold; the fixed-tau one is the report
-        depth = cell.get("b_requested") or cell.get("b")
+        cell_depth = cell.get("b_requested") or cell.get("b")
         print(
-            f"    {state}: success@{depth} = {cell['success_rate']:.4f} "
-            f"over {scored} systems at tau {tau} A"
+            f"{arm} -> {reference}: success@{cell_depth} = {cell['success_rate']:.3f} "
+            f"over {scored} of {panel or scored} systems (tau {tau} A)"
         )
+    print(f"results: {here(sidecar)}")
+    # WHAT THIS NUMBER IS NOT. The published rate is the whole panel at 100 draws; anything less is
+    # a different denominator or a shallower estimate, and says so rather than looking like the
+    # paper's value with a different number in it.
+    if scored < (panel or scored) or int(depth) < 100:
+        print("subset run; --systems 0 --draws 100 gives the reported rate")
+
+
+def report_paired_shift(sidecar: Path, arm: str, reference: str, level: float) -> None:
+    """The test-split result in one line: the mean paired RMSD change and the systems behind it.
+
+    The two paired-shift scorers write the same quantity under different shapes -- the cryptic one
+    keys its cells by level, the domain-motion one has a single top-level cell -- so both are read
+    here rather than restating either schema in prose.
+    """
+    payload = json.loads(sidecar.read_text())
+    cells = payload.get("levels") or {}
+    cell = cells.get(str(float(level)))
+    if cell is None:
+        cell = next(iter(cells.values())) if len(cells) == 1 else payload
+    mean, systems = cell.get("mean_delta_rmsd"), cell.get("n_systems")
+    if mean is None or systems is None:
+        raise SystemExit(
+            f"REFUSING: {sidecar.name} records no mean shift for level {level:+.0f}, so this run "
+            "scored nothing for the arm's own reference"
+        )
+    print(
+        f"{arm} -> {reference}: mean RMSD change (on - off) {float(mean):+.3f} A "
+        f"over {systems} systems"
+    )
+    print(f"results: {here(sidecar)}")
 
 
 def trained_level(adapter: Path) -> float:
@@ -210,12 +289,7 @@ def main() -> int:
     so3 = REPOSITORY / "data/processed/so3_cache"
     python = sys.executable
 
-    print(f"arm {arguments.arm}: {benchmark}, level {level:+.0f} -> {reference}")
-    print(
-        f"  split {arguments.split}; {arguments.systems or 'all'} systems x {arguments.draws} draws"
-    )
-    print(f"  adapter {adapter}")
-    print(f"  output  {destination}")
+    logs = destination / "logs"
 
     # The pool the run actually uses. ``generate_benchmark_ensemble.py`` takes a pool and no system
     # filter, so without this a two-system smoke run would still generate the unsteered control for
@@ -252,7 +326,6 @@ def main() -> int:
             systems = sorted(set(arguments.named_systems))
         else:
             systems = sorted(names)[: arguments.systems]
-        print(f"  systems {systems}")
 
     if systems:
         entries = [
@@ -272,7 +345,8 @@ def main() -> int:
     if benchmark == "cryptic" and arguments.split == "benchmark":
         run(
             [python, "scripts/release/fetch_structures.py"],
-            "cryptic: the deposited apo/holo entries the scorer measures against (RCSB; network)",
+            "fetching the deposited apo/holo entries",
+            logs / "fetch.log",
         )
 
     # BioEmu FAILS CLOSED on a missing embedding, rather than computing one mid-generation: a
@@ -290,9 +364,13 @@ def main() -> int:
                 "--report",
                 str(destination / "embeddings.json"),
             ],  # fmt: skip
-            f"embeddings for {len(systems) or 'all'} sequences (ColabFold; needs network)",
+            f"embedding {len(systems) or len(all_systems)} sequences",
+            logs / "embeddings.log",
+            show_log=True,
         )
 
+    count = len(systems) or len(all_systems)
+    generating = f"generating {count} systems x {arguments.draws} draws"
     if not arguments.score_only:
         if benchmark == "cryptic":
             control = destination / "control"
@@ -302,7 +380,12 @@ def main() -> int:
                 "--cache-embeds-dir", str(arguments.embeds), "--cache-so3-dir", str(so3),
                 "--draws", str(arguments.draws),
             ]  # fmt: skip
-            run(command, "cryptic: unsteered control (the paired arm)")
+            run(
+                command,
+                f"{generating}: unsteered controls",
+                logs / "control.log",
+                show_log=True,
+            )
             command = [
                 python, "scripts/cryptic_steering/generate_benchmark_steered.py",
                 "--pool", str(pool), "--adapter", str(adapter),
@@ -315,7 +398,12 @@ def main() -> int:
             ]  # fmt: skip
             for name in systems:
                 command += ["--system", name]
-            run(command, "cryptic: steered draws")
+            run(
+                command,
+                f"{generating}: steered",
+                logs / "generate.log",
+                show_log=True,
+            )
         else:
             script = {
                 "domain_motion": "scripts/domain_motion/generate_benchmark_draws.py",
@@ -340,7 +428,7 @@ def main() -> int:
                 command += ["--split-role", arguments.split]
             for name in systems:
                 command += ["--sequence", name]
-            run(command, f"{benchmark}: steered draws and matched controls")
+            run(command, generating, logs / "generate.log", show_log=True)
 
     # ------------------------------------------------------------------------------- scoring
     # Each scorer emits BOTH references whatever it is given; the arm's own is selected here, and
@@ -372,7 +460,8 @@ def main() -> int:
                 "--depth",
                 str(arguments.draws),
             ],  # fmt: skip
-            "cryptic: build a scoreable view of the steered store",
+            "building a scoreable view",
+            logs / "view.log",
         )
         index = next(views.rglob("index.jsonl"), None)
         if index is None:
@@ -400,9 +489,10 @@ def main() -> int:
                     "--min-draws",
                     str(min(MIN_PAIRED_DRAWS, arguments.draws)),
                 ],  # fmt: skip
-                f"cryptic test split: paired shift toward {reference}",
+                "scoring",
+                logs / "score.log",
             )
-            print(f"\n=== done. scored {reference} only -> {scored}")
+            report_paired_shift(scored / "paired_shift.json", arguments.arm, reference, level)
             return 0
         run(
             [
@@ -425,7 +515,8 @@ def main() -> int:
                 "--out-png",
                 str(scored / "success_at_b.png"),
             ],  # fmt: skip
-            f"cryptic: success@{arguments.draws} toward {reference} at tau {tau} A",
+            "scoring",
+            logs / "score.log",
             # The scorer reports BOTH states in one table, by design: that is the field-comparable
             # form. So it always looks 'complete' and its exit code says nothing about which state
             # this arm was trained toward. The gate below selects the arm's own state by NAME and
@@ -437,6 +528,9 @@ def main() -> int:
             len(systems) or CRYPTIC_SCORED_PANEL,
             "apo" if level < 0 else "holo",
             arguments.draws,
+            arm=arguments.arm,
+            reference=reference,
+            panel=CRYPTIC_SCORED_PANEL,
         )
     elif benchmark == "domain_motion":
         level_tag = "m1" if level < 0 else "p1"
@@ -472,7 +566,8 @@ def main() -> int:
                     "--draws-csv",
                     str(scored / "success_at_b_draws.csv"),
                 ],  # fmt: skip
-                f"domain motion: success@{arguments.draws} toward {reference} at tau {tau} A",
+                "scoring",
+                logs / "score.log",
                 partial_is_expected=bool(systems),
             )
             confirm_coverage(
@@ -480,8 +575,10 @@ def main() -> int:
                 len(systems) or len(all_systems),
                 "canonical_nearer" if level < 0 else "canonical_further",
                 arguments.draws,
+                arm=arguments.arm,
+                reference=reference,
+                panel=len(all_systems),
             )
-            print(f"\n=== done. scored {reference} only, at tau {tau} A -> {scored}")
             return 0
         artifact = DATA / "references/domain_motion_testsplit.pt"
         run(
@@ -503,9 +600,10 @@ def main() -> int:
                 "--min-draws",
                 str(min(MIN_PAIRED_DRAWS, arguments.draws)),
             ],  # fmt: skip
-            f"domain motion test split: paired shift toward {reference}, tau {tau} A",
+            "scoring",
+            logs / "score.log",
         )
-        print(f"\n=== done. scored {reference} only, at tau {tau} A -> {scored}")
+        report_paired_shift(scored / "paired_shift.json", arguments.arm, reference, level)
         return 0
     else:
         state = "dfg_in" if level < 0 else "dfg_out"
@@ -533,16 +631,21 @@ def main() -> int:
                 # sidecar (complete=false) rather than inferred from a short systems list.
                 *[flag for name in systems for flag in ("--smoke-system", name)],
             ],  # fmt: skip
-            f"kinase: success@{arguments.draws} toward {state} at tau {tau} A",
+            "scoring",
+            logs / "score.log",
             # Always: this scorer reports a single-direction arm as incomplete because it scored
             # one of the artifact's two states. confirm_coverage is the gate instead.
             partial_is_expected=True,
         )
         confirm_coverage(
-            scored / "success_at_b.json", len(systems) or len(all_systems), state, arguments.draws
+            scored / "success_at_b.json",
+            len(systems) or len(all_systems),
+            state,
+            arguments.draws,
+            arm=arguments.arm,
+            reference=reference,
+            panel=len(all_systems),
         )
-
-    print(f"\n=== done. scored {reference} only, at tau {tau} A -> {scored}")
     return 0
 
 

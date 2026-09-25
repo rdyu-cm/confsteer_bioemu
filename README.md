@@ -41,13 +41,14 @@ uv run confsteer steer-apply \
 `--adapter` is one of `rg_adapter_cold_v2`, `cryptic_uncond_{m1,p1}`,
 `domain_motion_uncond_{m1,p1}`, `kinase_uncond_{m1,p1}`. For each protein it generates one steered
 and one unsteered structure from a shared noise draw, so the difference is attributable to the
-intervention rather than to sampling. `--draws N` samples N structures per protein; pass `--seed` to make a run reproducible. Add `--no-control` to generate only the steered structure.
+intervention rather than to sampling, and writes each as a backbone PDB named
+`<id>_seed<seed>_on.pdb` or `_off.pdb`. `--draws N` samples N structures per protein; pass `--seed` to make a run reproducible. Add `--no-control` to generate only the steered structure.
 `--sequences 0` steers every protein in the FASTA, as above; `--sequences N` takes the first N
 (the default is 1) and `--sequence-id ID` names one.
 
 Drop `--reference` to steer without scoring. Keep it to report each arm's N/CA/C/O RMSD to the
-target conformer and the change between them; negative means the intervention moved the draw
-closer.
+target conformer, per draw and in `reference_rmsd.csv`; a lower `on` than `off` means the
+intervention moved that draw closer.
 
 **The reference layout.** All the proteins stay in the one FASTA, but target structures are put in a direction. Put **one file per protein**,
 each named so it **starts with that protein's FASTA id**, and point `--reference` at the directory:

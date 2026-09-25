@@ -250,7 +250,7 @@ def test_reference_scoring_is_n_ca_c_o_in_angstrom_and_pairs_residues_by_number(
 
     import typer
 
-    from sae_bioemu.cli import _score_against_reference
+    from sae_bioemu.cli import _score_against_reference, _value_columns
 
     system = "A0A075Q0W3"
     subprocess.run(
@@ -267,23 +267,18 @@ def test_reference_scoring_is_n_ca_c_o_in_angstrom_and_pairs_residues_by_number(
     first, second = entry["first"].double(), entry["second"].double()
     reference = tmp / f"{system}_first.pdb"
 
-    captured: list[str] = []
-    original = typer.echo
-    typer.echo = lambda message="", **_: captured.append(str(message))  # type: ignore[assignment]
-    try:
-        values = _score_against_reference(reference, REPO, sequence, first, second)
-    finally:
-        typer.echo = original  # type: ignore[assignment]
+    values = _score_against_reference(reference, REPO, sequence, first, second)
 
     # 1e-3 A, not zero: the reference goes out through a PDB and back through mdtraj's float32
     # nanometres, so a self-comparison lands near 2e-6 A. The bug this guards against read 29.3 A.
-    assert values["unsteered"] < 1e-3, captured
+    assert values["unsteered"] < 1e-3, values
     recorded = float(entry["separation_angstrom"])
     assert abs(values["steered"] - recorded) < 1e-4, (
         f"scoring the other conformer must reproduce the artifact's own separation "
         f"{recorded}, not {values['steered']}"
     )
-    assert any("N/CA/C/O" in line for line in captured), captured
+    # And the command must SAY which atom set the two numbers are, since it prints them bare.
+    assert "N/CA/C/O" in _value_columns(reference=True, control=True)
 
     shifted = reference.read_text().replace(" A   ", " A  1", 3)
     (tmp / "shifted.pdb").write_text(shifted)
@@ -655,7 +650,7 @@ def test_sequences_zero_means_every_protein_not_none(monkeypatch: pytest.MonkeyP
     combined = f"{result.output or ''}\n{result.exception or ''}"
     assert isinstance(result.exception, _Stop), f"stopped somewhere else:\n{combined}"
     assert "contained no sequences" not in combined, combined
-    counted = [line for line in (result.output or "").splitlines() if line.startswith("sequences")]
+    counted = [line for line in (result.output or "").splitlines() if line.startswith("encoding")]
     assert counted, combined
     assert int(counted[0].split()[1]) == 1000, f"--sequences 0 should read all 1000: {counted[0]}"
 
@@ -697,9 +692,8 @@ def test_every_adapters_property_can_be_persisted(name: str) -> None:
 
     It refuses an undeclared name rather than stamping a default, which is the right call -- a wrong
     unit on a persisted property is silent downstream. But only the radius-of-gyration property was
-    declared, so `steer-apply` generated both arms for each of the six conformational adapters and
-    then refused to write them. Nothing on CPU reached that line, and the earlier GPU runs were
-    invoking a CLI that never executed, so it survived.
+    declared, so the held-out evaluation, which persists both arms under the adapter's OWN property
+    name, generated every structure and then refused to write it.
     """
     torch = pytest.importorskip("torch")
 
@@ -793,9 +787,9 @@ def test_steer_apply_sequences_zero_means_every_protein(monkeypatch: pytest.Monk
     result = CliRunner().invoke(cli.app, ["steer-apply", "--fasta", str(fasta), "--sequences", "0"])
     combined = f"{result.output or ''}\n{result.exception or ''}"
     assert isinstance(result.exception, _Stop), f"stopped somewhere else:\n{combined}"
-    counted = [line for line in (result.output or "").splitlines() if line.startswith("proteins")]
+    counted = [line for line in (result.output or "").splitlines() if " proteins x " in line]
     assert counted, combined
-    assert counted[0].split()[1:4] == ["1000", "of", "1000"], counted[0]
+    assert counted[0].split()[1] == "1000", counted[0]
 
 
 def test_a_reference_directory_is_matched_by_id_at_a_separator(tmp_path: Path) -> None:
@@ -863,7 +857,7 @@ def test_the_coverage_gate_reads_the_state_it_is_asked_about(tmp_path: Path) -> 
             {"success_table": [cell("holo", 31), cell("apo", 32), cell("apo", 5, "specific")]}
         )
     )
-    confirm_coverage(sidecar, 32, "apo", 100)
+    confirm_coverage(sidecar, 32, "apo", 100, arm="cryptic_uncond_m1", reference="apo", panel=32)
     with pytest.raises(SystemExit, match="scored 31 systems"):
         confirm_coverage(sidecar, 32, "holo", 100)
     with pytest.raises(SystemExit, match="B=100"):
@@ -936,3 +930,104 @@ def test_the_paired_shift_scorer_refuses_when_nothing_is_scorable(tmp_path: Path
     )
     assert result.returncode == 1 and "REFUSING" in result.stderr, result.stderr[-800:]
     assert "IndexError" not in result.stderr
+
+
+@pytest.mark.parametrize(
+    "entry", ["import sae_bioemu.cli", "import runpy; runpy.run_path('scripts/run_benchmark.py')"]
+)
+def test_a_notebook_matplotlib_backend_does_not_break_the_entry_points(entry: str) -> None:
+    """Colab exports an inline backend the project environment lacks; matplotlib then refuses to
+    import, and BioEmu's AlphaFold2 imports it via TensorFlow/Keras before any embedding runs."""
+    import os
+    import sys
+
+    pytest.importorskip("matplotlib")
+    env = dict(os.environ, MPLBACKEND="module://not_an_installed_backend.inline")
+    code = f"{entry}\nimport matplotlib.pyplot\nprint('ok')"
+    if "run_benchmark" in entry:
+        # run_path executes main() only under __main__; the module-level repair is what matters.
+        code = code.replace(
+            "runpy.run_path('scripts/run_benchmark.py')",
+            "runpy.run_path('scripts/run_benchmark.py', run_name='not_main')",
+        )
+    result = subprocess.run(
+        [sys.executable, "-c", code], cwd=REPO, env=env, capture_output=True, text=True
+    )
+    assert result.returncode == 0 and "ok" in result.stdout, result.stderr[-1500:]
+
+
+def test_a_structure_file_name_says_which_protein_seed_and_arm_it_is() -> None:
+    """Both arms of a draw must land beside each other under names that cannot collide.
+
+    The id comes from a FASTA header, which may carry a separator or a space: unsanitised, one
+    protein's structures are written into some other directory, or under a name whose second word
+    is lost by every tool that splits on whitespace.
+    """
+    pytest.importorskip("torch")
+    from sae_bioemu.cli import _structure_filename
+
+    assert _structure_filename("abl1_kd", 11, "on") == "abl1_kd_seed11_on.pdb"
+    assert _structure_filename("abl1_kd", 11, "off") == "abl1_kd_seed11_off.pdb"
+    assert _structure_filename("../etc/x y", 3, "on") == ".._etc_x_y_seed3_on.pdb"
+    assert "/" not in _structure_filename("a/b", 1, "on")
+
+
+def test_an_arm_is_written_as_a_backbone_pdb_in_angstrom(tmp_path: Path) -> None:
+    """``steer-apply`` writes PDBs itself, so the units and the atom set are its responsibility.
+
+    BioEmu's coordinates are nanometres and a PDB is Angstrom. A factor of ten writes a file that
+    opens and renders and measures nothing, which is exactly the defect ``--reference`` scoring hit
+    once already -- so the round trip is asserted against the input rather than eyeballed.
+    """
+    torch = pytest.importorskip("torch")
+    numpy = pytest.importorskip("numpy")
+    mdtraj = pytest.importorskip("mdtraj")
+    pytest.importorskip("bioemu")
+
+    from sae_bioemu.cli import _structure_filename, _write_backbone_pdb
+
+    sequence = "ACDEFGHIKL"
+    generator = torch.Generator().manual_seed(0)
+    # Padded like the sampler's own output: [members, residues, 3] nanometres, and the frames beside
+    # it, which is what makes the written file backbone-complete rather than C-alpha only.
+    positions = torch.randn(1, len(sequence), 3, generator=generator) * 0.5
+    orientations = torch.eye(3).expand(1, len(sequence), 3, 3).contiguous()
+    path = tmp_path / _structure_filename("demo", 7, "on")
+    _write_backbone_pdb(path, positions, orientations, sequence)
+
+    assert [item.name for item in tmp_path.iterdir()] == [path.name], "a temporary file was left"
+    frame = mdtraj.load(str(path))
+    assert frame.topology.n_residues == len(sequence)
+    assert {"N", "CA", "C", "O"} <= {atom.name for atom in frame.topology.atoms}
+    # mdtraj reads the file's Angstrom back into nanometres, so the C-alphas must return the input.
+    alphas = [atom.index for atom in frame.topology.atoms if atom.name == "CA"]
+    centred = (positions[0] - positions[0].mean(dim=0)).numpy()
+    assert numpy.abs(frame.xyz[0][alphas] - centred).max() < 1e-3
+
+
+def test_a_stage_logs_its_output_and_prints_the_tail_only_when_it_fails(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """``run`` must keep a child's output out of the terminal and in a file -- until it fails.
+
+    A benchmark run is several children, each of which streams tables and progress for hours; what
+    the run concluded scrolls away. The output still has to be somewhere, and a failure has to say
+    what happened rather than only an exit code.
+    """
+    import sys
+
+    run = _run_benchmark_module().run
+    log = tmp_path / "logs" / "stage.log"
+
+    run([sys.executable, "-c", "print('quiet')"], "scoring", log)
+    printed = capsys.readouterr().out
+    assert printed.splitlines() == ["scoring... done"], printed
+    assert "quiet" in log.read_text()
+
+    failing = [sys.executable, "-c", "print('x'); raise SystemExit(3)"]
+    with pytest.raises(SystemExit, match="exited 3"):
+        run(failing, "generating 3 systems x 8 draws", log, show_log=True)
+    printed = capsys.readouterr().out
+    assert "(log: " in printed and "FAILED" in printed, printed
+    assert "x" in printed.splitlines()[-1], printed
+    assert "x" in log.read_text()
