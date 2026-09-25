@@ -24,15 +24,25 @@
   "unit_cursor": 19200,
   "checkpoint_identity_fingerprint": "91c987b336386a1c4e389cd5595b9d726ab2ab037389fb37fe971de1784fcaf5",
   "intervention_site": {
-   "score_calls": [
-    11,
-    22,
-    32,
-    43,
-    54,
-    65,
-    75,
-    86
+   "analysis_call_ordinals": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "capture_indices_one_based": [
+    12,
+    23,
+    33,
+    44,
+    55,
+    66,
+    76,
+    87
    ],
    "denoiser_iterations": [
     5,
@@ -44,6 +54,31 @@
     37,
     43
    ],
+   "denoiser_roles": [
+    "corrector",
+    "predictor",
+    "predictor",
+    "corrector",
+    "predictor",
+    "corrector",
+    "corrector",
+    "predictor"
+   ],
+   "expected_score_call_total": 98,
+   "max_timestep_distance": 0.06,
+   "module_path": "model_nn.st_module.encoder.layers.-1",
+   "provenance": "no_manifest_exploratory",
+   "requested_layer": "-1",
+   "requested_timesteps": [
+    0.8793912588226854,
+    0.7679795918367347,
+    0.667061224489796,
+    0.5560810539703095,
+    0.4450408163265307,
+    0.33394271195114644,
+    0.2329417983286289,
+    0.12210204081632658
+   ],
    "resolved_timesteps": [
     0.8793912588226854,
     0.7679795918367347,
@@ -54,20 +89,19 @@
     0.2329417983286289,
     0.12210204081632658
    ],
-   "analysis_call_ordinals": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8
+   "score_calls": [
+    11,
+    22,
+    32,
+    43,
+    54,
+    65,
+    75,
+    86
    ],
-   "module_path": "model_nn.st_module.encoder.layers.-1",
-   "expected_score_call_total": 98,
    "timestep_tolerance": 0.0001
-  }
+  },
+  "model_selection": null
  },
  "caveats": [
   "Scored ONLY on the direction it was trained toward; the other reference is a dose it never saw.",

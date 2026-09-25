@@ -88,6 +88,21 @@ def _append_reference_scores(
             out.writerow([sequence_id, seed, arm, f"{value:.4f}", reference.name])
 
 
+def _input_path(path: Path, root: Path) -> Path:
+    """A path the user gave: relative to the working directory, else to the repository.
+
+    The fallback keeps the defaults (``configs/...``, ``models/...``) working from anywhere.
+    """
+    if path.is_absolute() or path.exists():
+        return path.resolve()
+    return root / path
+
+
+def _output_path(path: Path) -> Path:
+    """Outputs land relative to the working directory, like any other command-line tool."""
+    return path.resolve()
+
+
 def _resolve_seed(requested: int | None) -> int:
     """The base seed: the one asked for, else a fresh one -- which is PRINTED, so the run can be
     reproduced afterwards.
@@ -150,14 +165,14 @@ def sae_encode(
     from sae_bioemu.core.paths import repository_root
 
     root = repository_root()
-    resolved = checkpoint if checkpoint.is_absolute() else root / checkpoint
-    fasta_path = fasta if fasta.is_absolute() else root / fasta
+    resolved = _input_path(checkpoint, root)
+    fasta_path = _input_path(fasta, root)
     if not resolved.is_file():
         raise typer.BadParameter(f"no SAE checkpoint at {resolved}; the shipped one is in models/")
     if not fasta_path.is_file():
         raise typer.BadParameter(f"no FASTA at {fasta_path}")
 
-    project = ProjectConfig.load(config if config.is_absolute() else root / config)
+    project = ProjectConfig.load(_input_path(config, root))
     # ``--sequences 0`` means ALL, matching steer-apply. Slicing ``[:0]`` would take NONE and then
     # report "contained no sequences", blaming the FASTA for the flag.
     parsed = read_fasta(str(fasta_path))
@@ -204,9 +219,7 @@ def sae_encode(
     if out_dir is None:
         typer.echo(counts)
     else:
-        path = _write_latents(
-            out_dir if out_dir.is_absolute() else root / out_dir, record, latents, model
-        )
+        path = _write_latents(_output_path(out_dir), record, latents, model)
         typer.echo(f"wrote {out_dir / path.name}: {counts}")
     typer.echo(f"reconstruction error (relative L2): {error:.3f}")
 
@@ -308,7 +321,7 @@ def _resolve_references(reference: Path | None, root: Path, chosen: list) -> dic
     # and reported without a distance rather than skipped or silently matched to another's file.
     references: dict[str, Path | None] = dict.fromkeys((item.sequence_id for item in chosen), None)
     if reference is not None:
-        located = reference if reference.is_absolute() else root / reference
+        located = _input_path(reference, root)
         if located.is_dir():
             for item in chosen:
                 # The id must end at a separator or at the extension. A bare prefix glob lets one
@@ -382,7 +395,7 @@ def _score_against_reference(
 
     from sae_bioemu.steering.aligned_rmsd import aligned_rmsd
 
-    path = reference if reference.is_absolute() else root / reference
+    path = _input_path(reference, root)
     if not path.is_file():
         raise typer.BadParameter(f"no reference structure at {path}")
     wanted, target_array = _reference_backbone(path, sequence)
@@ -501,9 +514,9 @@ def steer_apply(
     # has; a path is what the repository layout happens to be, and they should not need to know it.
     candidate = Path(adapter)
     resolved = candidate if candidate.suffix == ".pt" else root / "models" / f"{adapter}.pt"
-    if not resolved.is_absolute():
-        resolved = root / resolved
-    fasta_path = fasta if fasta.is_absolute() else root / fasta
+    if candidate.suffix == ".pt":
+        resolved = _input_path(candidate, root)
+    fasta_path = _input_path(fasta, root)
     if not resolved.is_file():
         raise typer.BadParameter(f"no adapter at {resolved}")
     sidecar = resolved.with_suffix(".json")
@@ -515,7 +528,7 @@ def steer_apply(
         json.loads(sidecar.read_text())["training"]["intervention_site"]
     )
 
-    project = ProjectConfig.load(config if config.is_absolute() else root / config)
+    project = ProjectConfig.load(_input_path(config, root))
     records = read_fasta(str(fasta_path))
     if not records:
         raise typer.BadParameter(f"{fasta_path} contained no sequences")
@@ -556,7 +569,7 @@ def steer_apply(
             f"{float(level):+.1f} is a dose it never saw."
         )
 
-    destination = out_dir if out_dir.is_absolute() else root / out_dir
+    destination = _output_path(out_dir)
     destination.mkdir(parents=True, exist_ok=True)
     typer.echo(
         f"{resolved.stem}: {len(chosen)} protein{'' if len(chosen) == 1 else 's'} x "
@@ -568,7 +581,8 @@ def steer_apply(
     # copy of any other one would otherwise be reported as though it steered the radius.
     steers_rg = payload["adapter_config"].get("property_name") == "radius_of_gyration"
     base_seed = _resolve_seed(seed)
-    if any(path is not None for path in references.values()):
+    any_reference = any(path is not None for path in references.values())
+    if any_reference:
         typer.echo(_value_columns(reference=True, control=control))
     elif steers_rg:
         typer.echo(_value_columns(reference=False, control=control))
@@ -680,7 +694,8 @@ def steer_apply(
                     values,
                 )
                 wrote_csv = True
-            elif steers_rg:
+            # One header covers every line, so a radius never prints under an RMSD header.
+            elif steers_rg and not any_reference:
                 values = {"steered": rg("steered", positions)}
                 if unsteered is not None:
                     values["unsteered"] = rg("unsteered", unsteered)

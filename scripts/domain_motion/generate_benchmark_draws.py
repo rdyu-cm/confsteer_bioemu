@@ -163,7 +163,10 @@ def load_intervention_site(report_path: Path) -> tuple[SteeringSite, dict[str, o
     from ``scripts/kinase_dfg/generate_held_out_draws.py``, which is this script's precedent.
     """
     payload = json.loads(report_path.read_text())
-    spec = payload.get("intervention_site")
+    # A shipped model's sidecar nests the site under ``training``; a raw training report does not.
+    spec = payload.get("intervention_site") or (payload.get("training") or {}).get(
+        "intervention_site"
+    )
     if not isinstance(spec, dict):
         raise SystemExit(
             f"{report_path} carries no intervention_site block, so the site the checkpoint was "

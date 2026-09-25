@@ -155,7 +155,10 @@ def load_intervention_site(report_path: Path) -> tuple[SteeringSite, dict[str, o
     that reports a complete-looking number. The recorded block names the absolute score call.
     """
     payload = json.loads(report_path.read_text())
-    site_spec = payload.get("intervention_site")
+    # A shipped model's sidecar nests the site under ``training``; a raw training report does not.
+    site_spec = payload.get("intervention_site") or (payload.get("training") or {}).get(
+        "intervention_site"
+    )
     if not isinstance(site_spec, dict):
         raise SystemExit(
             f"{report_path} carries no intervention_site block, so the site the checkpoint was "

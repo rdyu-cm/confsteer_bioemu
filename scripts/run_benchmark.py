@@ -119,7 +119,14 @@ def run(
     log.parent.mkdir(parents=True, exist_ok=True)
     print(f"{label}{f' (log: {here(log)})' if show_log else ''}...", end="", flush=True)
     with log.open("w") as handle:
-        result = subprocess.run(command, cwd=REPOSITORY, stdout=handle, stderr=subprocess.STDOUT)
+        result = subprocess.run(
+            command,
+            cwd=REPOSITORY,
+            stdout=handle,
+            stderr=subprocess.STDOUT,
+            # Line by line, so the log a user was told to follow fills as the stage runs.
+            env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        )
     if result.returncode == 0 or (partial_is_expected and result.returncode == 1):
         print(" done", flush=True)
         return
@@ -277,6 +284,9 @@ def main() -> int:
     parser.add_argument("--score-only", action="store_true", help="skip generation")
     arguments = parser.parse_args()
 
+    # Relative to where the user is, and made absolute before any child runs: children run from
+    # the repository root, so a relative path would name a different directory there.
+    arguments.out, arguments.embeds = arguments.out.resolve(), arguments.embeds.resolve()
     benchmark, reference = ARMS[arguments.arm]
     if benchmark == "kinase" and arguments.split == "test":
         raise SystemExit(
@@ -389,7 +399,7 @@ def main() -> int:
             command = [
                 python, "scripts/cryptic_steering/generate_benchmark_steered.py",
                 "--pool", str(pool), "--adapter", str(adapter),
-                "--train-run-report", str(adapter.with_name(adapter.stem + "_report.json")),
+                "--train-run-report", str(adapter.with_suffix(".json")),
                 "--output-dir", str(destination / "steered"),
                 "--native-index", str(control / "final_structures/index.jsonl"),
                 "--cache-embeds-dir", str(arguments.embeds), "--cache-so3-dir", str(so3),
@@ -416,7 +426,7 @@ def main() -> int:
             }[(benchmark, arguments.split)]
             command = [
                 python, script, "--artifact", str(artifact), "--adapter", str(adapter),
-                "--train-run-report", str(adapter.with_name(adapter.stem + "_report.json")), "--output-dir", str(destination),
+                "--train-run-report", str(adapter.with_suffix(".json")), "--output-dir", str(destination),
                 "--cache-embeds-dir", str(arguments.embeds), "--cache-so3-dir", str(so3),
                 "--draws", str(arguments.draws), "--level", str(level),
                 "--batch-size", "1", "--device", arguments.device,

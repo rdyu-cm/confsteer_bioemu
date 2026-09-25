@@ -92,25 +92,25 @@ def test_shipped_model_matches_its_provenance_sidecar(name: str) -> None:
 
 
 @pytest.mark.parametrize("name", BENCHMARK_ADAPTERS)
-def test_benchmark_adapter_is_single_direction_and_agrees_with_its_report(name: str) -> None:
+def test_benchmark_adapter_is_single_direction_and_agrees_with_its_sidecar(name: str) -> None:
     """The arm's trained level decides which reference it may be scored against.
 
     ``run_benchmark.py`` reads the level from the checkpoint and the injection site from the
-    report beside it. If those two disagree the run would steer at one dose and measure another,
+    sidecar beside it. If those two disagree the run would steer at one dose and measure another,
     so the equality is asserted here rather than trusted.
     """
     torch = pytest.importorskip("torch")
     checkpoint = torch.load(REPO / "models" / f"{name}.pt", map_location="cpu", weights_only=False)
-    report = json.loads((REPO / "models" / f"{name}_report.json").read_text())
+    sidecar = json.loads((REPO / "models" / f"{name}.json").read_text())
     config = checkpoint["adapter_config"]
 
     levels = config["target_levels"]
     assert len(levels) == 1, f"{name} is not single-direction: {levels}"
-    assert report["target_levels"] == levels
+    assert [sidecar["trained_level"]] == levels
 
     site = config["intervention_site"]
     site = json.loads(site) if isinstance(site, str) else site
-    assert report["intervention_site"] == site
+    assert sidecar["training"]["intervention_site"] == site
     assert len(site["score_calls"]) == 8
 
 
@@ -197,7 +197,7 @@ def test_run_benchmark_knows_every_shipped_adapter() -> None:
     assert sorted(module.ARMS) == sorted(BENCHMARK_ADAPTERS)
     for name in module.ARMS:
         assert (REPO / "models" / f"{name}.pt").is_file()
-        assert (REPO / "models" / f"{name}_report.json").is_file()
+        assert (REPO / "models" / f"{name}.json").is_file()
 
 
 @pytest.mark.parametrize("name", SHIPPED_MODELS[1:])
@@ -206,9 +206,8 @@ def test_every_adapter_builds_its_site_through_the_function_steer_apply_calls(na
 
     It calls the SAME function the command calls, rather than re-implementing it: the previous
     version of this test rebuilt the site by hand without the two guard fields, passed, and the
-    command died with ``KeyError`` on every conformational adapter. For the six with a training
-    report, the sidecar's site must also equal the report's, which is what the benchmark
-    generators read -- so the command and the benchmark steer at the same calls.
+    command died with ``KeyError`` on every conformational adapter. The benchmark generators read
+    the same sidecar block, so the command and the benchmark steer at the same calls.
     """
     pytest.importorskip("torch")
     pytest.importorskip("bioemu")
@@ -223,11 +222,7 @@ def test_every_adapter_builds_its_site_through_the_function_steer_apply_calls(na
     assert len(site.score_calls) == len(site.expected_timesteps)
     assert site.expected_score_call_total is not None
 
-    report = REPO / "models" / f"{name}_report.json"
-    if report.is_file():
-        assert site == steering_site_from_record(
-            json.loads(report.read_text())["intervention_site"]
-        )
+    if name in BENCHMARK_ADAPTERS:  # the Rg adapter is trained at several levels
         levels = payload["adapter_config"]["target_levels"]
         assert len(levels) == 1, f"{name} is documented as single-direction"
 
@@ -1031,3 +1026,35 @@ def test_a_stage_logs_its_output_and_prints_the_tail_only_when_it_fails(
     assert "(log: " in printed and "FAILED" in printed, printed
     assert "x" in printed.splitlines()[-1], printed
     assert "x" in log.read_text()
+
+
+def test_a_relative_path_is_read_from_where_the_user_is(tmp_path: Path, monkeypatch) -> None:
+    """``--fasta my.fasta`` means the file in the working directory; defaults still resolve."""
+    from sae_bioemu.cli import _input_path, _output_path
+
+    (tmp_path / "mine.fasta").write_text(">a\nAAA\n")
+    monkeypatch.chdir(tmp_path)
+    assert _input_path(Path("mine.fasta"), REPO) == tmp_path / "mine.fasta"
+    assert (
+        _input_path(Path("models/kinase_uncond_p1.pt"), REPO) == REPO / "models/kinase_uncond_p1.pt"
+    )
+    assert _output_path(Path("outputs/x")) == tmp_path / "outputs/x"
+
+
+def test_the_benchmark_generators_read_the_site_from_the_shipped_sidecar() -> None:
+    """``run_benchmark.py`` hands the generators ``models/<name>.json``; no report file ships."""
+    import importlib.util
+
+    assert not list((REPO / "models").glob("*_report.json"))
+    spec = importlib.util.spec_from_file_location(
+        "kinase_generate", REPO / "scripts/kinase_dfg/generate_kinase_benchmark_draws.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    pytest.importorskip("torch")
+    try:
+        spec.loader.exec_module(module)
+    except ImportError as error:  # the generator needs BioEmu's optional runtime
+        pytest.skip(str(error))
+    site, _spec = module.load_intervention_site(REPO / "models/kinase_uncond_p1.json")
+    assert len(site.score_calls) == 8
+    assert 'adapter.with_suffix(".json")' in (REPO / "scripts/run_benchmark.py").read_text()

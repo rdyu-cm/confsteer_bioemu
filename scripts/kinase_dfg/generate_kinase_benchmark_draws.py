@@ -244,7 +244,10 @@ def load_intervention_site(report_path: Path) -> tuple[SteeringSite, dict[str, o
     calls the adapter was applied at.
     """
     payload = json.loads(report_path.read_text())
-    spec = payload.get("intervention_site")
+    # A shipped model's sidecar nests the site under ``training``; a raw training report does not.
+    spec = payload.get("intervention_site") or (payload.get("training") or {}).get(
+        "intervention_site"
+    )
     if not isinstance(spec, dict):
         raise SystemExit(
             f"{report_path} carries no intervention_site block, so the site the checkpoint was "
@@ -900,7 +903,9 @@ def main(argv: Sequence[str] | None = None) -> int:  # noqa: PLR0915 - one linea
             # missing file: this property runs ``model_selection: none`` because the pool is 41
             # train / 0 validation / 20 holdout, so there are no ``.best-N`` sidecars to look for
             # and the checkpoint here is the terminal one.
-            "adapter_model_selection": train_report.get("model_selection"),
+            "adapter_model_selection": train_report.get(
+                "model_selection", (train_report.get("training") or {}).get("model_selection")
+            ),
             # The TRAINING reference's identity, carried beside this run's. They differ by
             # construction -- this one is the twenty held-out genes, that one the whole pool -- and
             # a reader has to be able to see both to know that they should.
