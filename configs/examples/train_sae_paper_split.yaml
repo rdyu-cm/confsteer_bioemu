@@ -1,0 +1,73 @@
+# The paths and hyperparameters of the shipped SAE, on the EXACT split the paper used.
+#
+# TRAINING IS NOT PART OF THIS RELEASE: it ships trained models and the code to run them.
+# This file is what `sae-encode` reads for the split, layer and timestep the SAE was
+# trained at, and is the record of those settings.
+#
+#   uv run confsteer sae-encode --config configs/examples/train_sae_paper_split.yaml
+#
+# The hyperparameters are those that produced models/sae_k32_time_layer_m1.pt; the paths point at
+# data/splits/, which ships in the repository.
+#
+# WHY THE SPLIT SHIPS. Re-deriving it does not reproduce it: it was drawn from a UniRef50 release that
+# is replaced upstream every few weeks, keeping a candidate only if the live InterPro API returned
+# spans for it. See data/splits/README.md.
+#
+# REQUIREMENTS: a GPU, the bioemu-cuda extra, and network access for embeddings on first use.
+
+sae:
+  input_dim: 512
+  n_latents: 4096
+  top_k: 32
+  aux_k: 256
+  aux_k_coef: 0.03125
+  dead_tokens_threshold: 1000000
+  timestep_mlp_hidden_dim: 128
+  use_time_conditioning: true
+  normalize_inputs: true
+
+trace:
+  model_name: bioemu-v1.1
+  target_module: model_nn.st_module.encoder.layers.-1
+  denoiser_type: dpm
+  denoiser_config_path:
+  cache_so3_dir: ${SAE_DATA_ROOT}/processed/so3_cache
+  recorded_score_calls: 10
+  samples_per_sequence: 32
+  save_final_structures: true
+  final_structures_subdir: final_structures
+
+training:
+  activation_source: bioemu
+  input_fasta: ${SAE_DATA_ROOT}/splits/uniref50_interpro_train_1000.fasta
+  cache_embeds_dir: ${SAE_DATA_ROOT}/processed/embeds_cache_interpro_train_1000
+  runtime_structure_dir: ${SAE_OUTPUT_ROOT}/runtime_structures_interpro_train_1000
+  runtime_sequence_batch_size: 1
+  runtime_activation_buffer_size: 32768
+  output_dir: ${SAE_OUTPUT_ROOT}/sae_paper_split_k32_time_layer_m1
+  batch_size: 8192
+  epochs: 1
+  learning_rate: 0.0001
+  lr_scheduler: linear
+  lr_warmup_steps: 300
+  min_learning_rate: 0.00003
+  weight_decay: 0.0
+  metrics_interval: 50
+  seed: 0
+  device: auto
+  mixed_precision: true
+
+uniref50:
+  num_clusters: 1000
+  max_sequence_length: 300
+  seed: 0
+
+analysis:
+  interpro_annotations_path: ${SAE_DATA_ROOT}/splits/interpro_eval_1000.jsonl
+  evaluation_input_fasta: ${SAE_DATA_ROOT}/splits/uniref50_interpro_eval_1000.fasta
+  evaluation_cache_embeds_dir: ${SAE_DATA_ROOT}/processed/embeds_cache_interpro_eval_1000
+  evaluation_structure_dir: ${SAE_OUTPUT_ROOT}/runtime_structures_interpro_eval_1000
+  evaluation_samples_per_sequence: 32
+  concept_min_positive_residues: 100
+  concept_min_positive_domains: 10
+  concept_min_positive_sequences: 10

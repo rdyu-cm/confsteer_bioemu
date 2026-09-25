@@ -1,0 +1,99 @@
+[project]
+name = "confsteer-bioemu"
+version = "0.1.0"
+description = "Steering BioEmu toward named protein conformations with bounded-residual adapters, and sparse autoencoders on its residue-level representations"
+readme = "README.md"
+requires-python = ">=3.11, <3.12"
+authors = [{ name = "The Authors" }]
+dependencies = [
+    "numpy==1.26.4",
+    "matplotlib==3.10.9",
+    "pyyaml==6.0.3",
+    "scipy==1.15.3",
+    "torch==2.6.0",
+    "optree==0.16.0",
+    "typer==0.12.5",
+    "click==8.1.8",
+]
+
+[project.optional-dependencies]
+bioemu-cuda = [
+    "bioemu==1.3.1",
+    "torch-geometric==2.8.0",
+    "jax[cuda12]==0.4.35; sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "nvidia-cuda-nvcc-cu12==12.8.93; sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "tensorflow-cpu==2.17.1",
+    "protobuf==4.25.8",
+]
+dev = [
+    "pytest==8.4.2",
+    "ruff==0.6.9",
+]
+
+[project.scripts]
+confsteer = "sae_bioemu.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# The distribution is ``confsteer-bioemu`` and the import package is ``sae_bioemu``, so the wheel
+# target must be named: hatchling's default discovery looks for ``src/confsteer_bioemu`` and fails
+# the build. The import package is NOT renamed to match, because every shipped adapter checkpoint
+# records its class as ``sae_bioemu.steering.adapter.BoundedResidualAdapter`` -- renaming the module
+# would break loading the models this release exists to ship.
+[tool.hatch.build.targets.wheel]
+packages = ["src/sae_bioemu"]
+
+[tool.uv]
+package = true
+# The environment every reported number was produced with, package for package. torch 2.6.0 against
+# CUDA 12.4 rather than a newer build: it is what generated and verified the results, and CUDA 12.4
+# wheels run on NVIDIA drivers from 550 up where 12.8 needs 570, so it runs on MORE clusters.
+#
+# The constraints below hold every TRANSITIVE package that environment resolved differently from a
+# fresh lock. They matter beyond tidiness. mdtraj computes the RMSDs the scorers report, and a fresh
+# resolve chose 1.10.3 where the results were computed with 1.11.0 -- and 1.10.3 also drags in
+# netcdf4, which has no wheel for older glibc and fails to build without system libraries.
+constraint-dependencies = [
+    "contourpy==1.3.2",
+    "h5py==3.11.0",
+    "pandas==2.2.3",
+    "pillow==11.1.0",
+    "mdtraj==1.11.0",
+    "jaxlib==0.4.34",
+    "absl-py==2.5.0",
+    "aiohappyeyeballs==2.7.1",
+    "anyio==4.14.2",
+    "charset-normalizer==3.4.9",
+    "filelock==3.30.2",
+    "grpcio==1.82.1",
+    "hf-xet==1.5.2",
+    "hydra-core==1.3.4",
+    "setuptools==83.0.0",
+    "tqdm==4.68.4",
+    "typing-extensions==4.16.0",
+    "tzdata==2026.3",
+    "uv==0.11.29",
+    "xxhash==3.8.1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu124" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,86 @@
+{
+ "schema": "release_adapter_report/1",
+ "what": "The fields the benchmark generators read from a training run report, taken from the shipped checkpoint itself so the two cannot disagree.",
+ "intervention_site": {
+  "analysis_call_ordinals": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "capture_indices_one_based": [
+   12,
+   23,
+   33,
+   44,
+   55,
+   66,
+   76,
+   87
+  ],
+  "denoiser_iterations": [
+   5,
+   11,
+   16,
+   21,
+   27,
+   32,
+   37,
+   43
+  ],
+  "denoiser_roles": [
+   "corrector",
+   "predictor",
+   "predictor",
+   "corrector",
+   "predictor",
+   "corrector",
+   "corrector",
+   "predictor"
+  ],
+  "expected_score_call_total": 98,
+  "max_timestep_distance": 0.06,
+  "module_path": "model_nn.st_module.encoder.layers.-1",
+  "provenance": "no_manifest_exploratory",
+  "requested_layer": "-1",
+  "requested_timesteps": [
+   0.8793912588226854,
+   0.7679795918367347,
+   0.667061224489796,
+   0.5560810539703095,
+   0.4450408163265307,
+   0.33394271195114644,
+   0.2329417983286289,
+   0.12210204081632658
+  ],
+  "resolved_timesteps": [
+   0.8793912588226854,
+   0.7679795918367347,
+   0.667061224489796,
+   0.5560810539703095,
+   0.4450408163265307,
+   0.33394271195114644,
+   0.2329417983286289,
+   0.12210204081632658
+  ],
+  "score_calls": [
+   11,
+   22,
+   32,
+   43,
+   54,
+   65,
+   75,
+   86
+  ],
+  "timestep_tolerance": 0.0001
+ },
+ "model_selection": "none",
+ "target_levels": [
+  1.0
+ ]
+}

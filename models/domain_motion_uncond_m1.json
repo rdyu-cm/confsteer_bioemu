@@ -1,0 +1,77 @@
+{
+ "name": "domain_motion_uncond_m1",
+ "what": "Single-direction bounded-residual adapter steering BioEmu toward the conformer NEARER the unsteered BioEmu ensemble on the domain-motion benchmark.",
+ "benchmark": "domain-motion",
+ "trained_level": -1.0,
+ "reference_state": "the conformer NEARER the unsteered BioEmu ensemble",
+ "property": "domain_motion_backbone_rmsd",
+ "tau_angstrom": 3.0,
+ "sha256": "7c806a94e6442d6338f2f687c40c14183a7a110991717e1195cea2e2ff9860c4",
+ "bytes": 5640832,
+ "architecture": {
+  "width": 512,
+  "input_width": 1024,
+  "hidden_width": 64,
+  "hidden_layers": 2,
+  "rho_max": 1.0,
+  "residual_cap": "none",
+  "level_conditioning": "none",
+  "eps": 1e-08,
+  "class": "sae_bioemu.steering.adapter.BoundedResidualAdapter"
+ },
+ "training": {
+  "epoch": 60,
+  "unit_cursor": 17460,
+  "checkpoint_identity_fingerprint": "1996e0ba64537c66e931663ef14482f8bf22ad756d055fd341d868b5d1d6da6c",
+  "intervention_site": {
+   "score_calls": [
+    11,
+    22,
+    32,
+    43,
+    54,
+    65,
+    75,
+    86
+   ],
+   "denoiser_iterations": [
+    5,
+    11,
+    16,
+    21,
+    27,
+    32,
+    37,
+    43
+   ],
+   "resolved_timesteps": [
+    0.8793912588226854,
+    0.7679795918367347,
+    0.667061224489796,
+    0.5560810539703095,
+    0.4450408163265307,
+    0.33394271195114644,
+    0.2329417983286289,
+    0.12210204081632658
+   ],
+   "analysis_call_ordinals": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "module_path": "model_nn.st_module.encoder.layers.-1",
+   "expected_score_call_total": 98,
+   "timestep_tolerance": 0.0001
+  }
+ },
+ "caveats": [
+  "Scored ONLY on the direction it was trained toward; the other reference is a dose it never saw.",
+  "One training run at one seed. Intervals are across-system SEMs over benchmark proteins and do not capture run-to-run training variance.",
+  "optimizer_state is emptied for release; the weights are bit-identical to the trained checkpoint."
+ ]
+}

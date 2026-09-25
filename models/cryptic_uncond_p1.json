@@ -1,0 +1,77 @@
+{
+ "name": "cryptic_uncond_p1",
+ "what": "Single-direction bounded-residual adapter steering BioEmu toward holo on the cryptic-pocket benchmark.",
+ "benchmark": "cryptic-pocket",
+ "trained_level": 1.0,
+ "reference_state": "holo",
+ "property": "pocket_conformer_rmsd",
+ "tau_angstrom": 1.0,
+ "sha256": "2e8ee9911b0828cf49362ce486a7c7984a02f6c246a7b3845b13fcd528287192",
+ "bytes": 6076544,
+ "architecture": {
+  "width": 512,
+  "input_width": 1024,
+  "hidden_width": 64,
+  "hidden_layers": 2,
+  "rho_max": 1.0,
+  "residual_cap": "none",
+  "level_conditioning": "none",
+  "eps": 1e-08,
+  "class": "sae_bioemu.steering.adapter.BoundedResidualAdapter"
+ },
+ "training": {
+  "epoch": 40,
+  "unit_cursor": 19200,
+  "checkpoint_identity_fingerprint": "91c987b336386a1c4e389cd5595b9d726ab2ab037389fb37fe971de1784fcaf5",
+  "intervention_site": {
+   "score_calls": [
+    11,
+    22,
+    32,
+    43,
+    54,
+    65,
+    75,
+    86
+   ],
+   "denoiser_iterations": [
+    5,
+    11,
+    16,
+    21,
+    27,
+    32,
+    37,
+    43
+   ],
+   "resolved_timesteps": [
+    0.8793912588226854,
+    0.7679795918367347,
+    0.667061224489796,
+    0.5560810539703095,
+    0.4450408163265307,
+    0.33394271195114644,
+    0.2329417983286289,
+    0.12210204081632658
+   ],
+   "analysis_call_ordinals": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "module_path": "model_nn.st_module.encoder.layers.-1",
+   "expected_score_call_total": 98,
+   "timestep_tolerance": 0.0001
+  }
+ },
+ "caveats": [
+  "Scored ONLY on the direction it was trained toward; the other reference is a dose it never saw.",
+  "One training run at one seed. Intervals are across-system SEMs over benchmark proteins and do not capture run-to-run training variance.",
+  "optimizer_state is emptied for release; the weights are bit-identical to the trained checkpoint."
+ ]
+}

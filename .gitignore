@@ -1,0 +1,39 @@
+# Run output. Everything a command writes goes under outputs/, so that is the one rule that matters.
+outputs/
+/examples/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+.pytest_cache/
+
+# Generated artefacts. `*.pt` keeps model and checkpoint blobs out by default; the two exceptions
+# below are INPUTS the shipped code reads, not output it produces, and both are named explicitly.
+# A rule of this shape silently un-shipped a reference artifact once: the file sat in the working
+# tree, so every test passed locally and would have failed in a clone.
+*.pt
+*.pth
+*.npz
+*.log
+
+# The trained models this release exists to hand a reader.
+!models/*.pt
+
+# The benchmark reference geometry the shipped scorers read.
+!data/benchmarks/references/*.pt
+
+# Deposited structures for the cryptic-pocket benchmark, fetched on demand by
+# scripts/release/fetch_structures.py. Public entries, not ours to redistribute here.
+data/benchmarks/structures/
+
+# Build tooling output. The scrub report lists the identifiers the anonymisation removed, so it is
+# a directory of exactly what must not ship -- and no shape-based guard can catch a bare surname.
+# It became tracked once, when this file was rewritten and the rule that had excluded it went with
+# it, which is why the exclusion is now stated rather than incidental.
+scripts/release/*_report.json

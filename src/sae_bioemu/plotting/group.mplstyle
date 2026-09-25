@@ -1,0 +1,48 @@
+# Lab group figure style.
+#
+# Verbatim copy of the group matplotlibrc.  Do not edit to suit one figure:
+# per-figure deviations belong in the calling script, and the ``text.usetex``
+# line is toggled at load time by ``sae_bioemu.plotting.style`` on hosts with no
+# LaTeX toolchain.
+
+patch.linewidth: 0.5
+
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: 110d1b
+patch.antialiased: True
+
+font.size: 10.0
+
+axes.linewidth: 1.5
+axes.facecolor: white
+axes.edgecolor: 110d1b
+axes.grid: False
+axes.titlesize: x-large
+axes.labelsize: 18
+axes.labelcolor: 110d1b
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+# NOTE: hex colours are written without a leading '#'.  matplotlib strips
+# everything from the first '#' as a comment, so the group file's original
+# '#00386b' form truncates the line and silently falls back to the default
+# matplotlib cycle.  Bare hex is the same colour, parsed correctly.
+axes.prop_cycle: cycler("color", ['00386b', '00679f', '1b9ad0', '54cffb', 'fbac41', 'fa8f34', 'f87026', 'f54b1a'])
+
+xtick.color: 25282A
+xtick.major.width: 1.0
+xtick.minor.width: 0.75
+xtick.direction: out
+
+ytick.color: 25282A
+ytick.direction: out
+ytick.major.width: 1.0
+ytick.minor.width: 0.75
+
+figure.facecolor: white
+figure.edgecolor: 0.50
+
+text.usetex         : True
+text.latex.preamble : \usepackage{amsmath}
+
+legend.frameon      : False
+legend.fontsize     : 14.

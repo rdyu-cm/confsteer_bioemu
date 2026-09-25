@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "confsteer-bioemu"
+abstract: >-
+  TopK sparse autoencoders on BioEmu residue-level representations, and
+  bounded-residual adapters that steer the BioEmu denoiser toward named
+  conformational states on cryptic-pocket, domain-motion and kinase DFG
+  benchmarks.
+type: software
+authors:
+  - name: "The Authors"
+version: "0.1.0"
+date-released: "2026-09-25"
+license: MIT
+keywords:
+  - sparse autoencoder
+  - mechanistic interpretability
+  - protein structure
+  - BioEmu
+  - conformational steering

@@ -1,0 +1,130 @@
+{
+ "contents": {
+  "domain_motion_assets/": {
+   "files": 46,
+   "what": "public multiconf_domainmotion reference copy"
+  },
+  "domain_motion_split_record.json": {
+   "movements": 398
+  },
+  "pools/cryptic_benchmark.json": {
+   "sequences": 34
+  },
+  "pools/cryptic_testsplit.json": {
+   "sequences": 134
+  },
+  "pools/domain_motion.json": {
+   "sequences": 22
+  },
+  "pools/domain_motion_testsplit.json": {
+   "sequences": 69
+  },
+  "pools/kinase.json": {
+   "sequences": 20
+  },
+  "references/cryptic_benchmark.pt": {
+   "systems": 32,
+   "subset_from": 34,
+   "note": "the 32 systems the benchmark actually scores; Q16539 has no recoverable ranges and Q02763 no measurable apo/holo separation"
+  },
+  "references/cryptic_testsplit.pt": {
+   "bytes": 2460730,
+   "subset_from": 1920,
+   "systems": 134
+  },
+  "references/domain_motion_benchmark.pt": {
+   "bytes": 1556690,
+   "subset_from": 22,
+   "systems": 22
+  },
+  "references/domain_motion_testsplit.pt": {
+   "bytes": 3350078,
+   "subset_from": 398,
+   "systems": 69
+  },
+  "references/kinase.pt": {
+   "bytes": 84402,
+   "subset_from": 20,
+   "systems": 20
+  },
+  "rosters/cryptic_structures.json": {
+   "entries": 66
+  },
+  "rosters/cryptic_testsplit_apo_holo.json": {
+   "bytes": 17331
+  },
+  "rosters/cryptic_testsplit_systems.json": {
+   "systems": 134
+  },
+  "rosters/domain_motion_canonical_labels.json": {
+   "bytes": 3236
+  },
+  "rosters/domain_motion_testsplit_systems.json": {
+   "systems": 69
+  }
+ },
+ "sha256": {
+  "domain_motion_assets/reference/A0A075Q0W3/6MKA_A.pdb": "6c6c821139783a373e11e7e7a5036e6bba64cf54b84b4ae70523129a0cfdd046",
+  "domain_motion_assets/reference/A0A075Q0W3/6MKJ_A.pdb": "4146535d3586ef80275008a31e7de093079023846501d0d81d05a883750c93e5",
+  "domain_motion_assets/reference/A0A0H3AFX3/6PWJ_A.pdb": "df3c1f652b0fd0aef0746886bf2a4777fe5f05e475af350dbb80b92085058275",
+  "domain_motion_assets/reference/A0A0H3AFX3/6PWK_A.pdb": "bfbfdc61fd99077cc5557664a271980b4972e79e194cf6187211f3fcd3a3bcac",
+  "domain_motion_assets/reference/A2RJ53/3DRF_A.pdb": "ae120e84575522c58e263bc06b3ca5ace218e67c6a61526f12430eb7ef0913ac",
+  "domain_motion_assets/reference/A2RJ53/3FTO_A.pdb": "d76eeb20080f16e2fbe578a7cb7d4c794c8c573b083104b492bc82b1f5b66a3c",
+  "domain_motion_assets/reference/B0F0C5/6PQN_A.pdb": "4f1bf254e14aa375848f6e8cbc32c0a1dd717bf454b10a515dd28c1da8ac2ecb",
+  "domain_motion_assets/reference/B0F0C5/6PQX_A.pdb": "d5b61983983c4657dd1ee36206570ee7e4e950c050c0d45a194cc357d717b032",
+  "domain_motion_assets/reference/P0205/1URP_A.pdb": "f18e5d66be3a6af67e856ecdd2e6abfff489d8135623d6cc8d287a656b38d449",
+  "domain_motion_assets/reference/P0205/2DRI_A.pdb": "0ab963f212b50574a49edd66e58c9d0a3534e0502528116826650973adf88b1c",
+  "domain_motion_assets/reference/P02911/6ML0_A.pdb": "bccb7edc677816f6f659445c3c5d2923342d9c1af50631829cffdb6a9072f641",
+  "domain_motion_assets/reference/P02911/6MLP_A.pdb": "740244ca80ca5f9452b5e1fbd513422328492d6b1655f7d092ae2b424cc524c7",
+  "domain_motion_assets/reference/P03047/7UBJ_A.pdb": "852720768798824e12748e2a1354ace49842631f02e69cc2c74ded5e1ee7239e",
+  "domain_motion_assets/reference/P03047/7UBL_A.pdb": "403696f224d3c0cf96366ea545991143741eed1f70b050fc95c6e1491795042a",
+  "domain_motion_assets/reference/P06766/1BPD_A.pdb": "f0dfd8772b3f9aa5409091d9320276098803cf1355c24b3d2c7ccecccc20fe37",
+  "domain_motion_assets/reference/P06766/2BPG_E.pdb": "be373a52a81132c8362e1babbf5371b15c011f8960fdff1407a4d41472091cf4",
+  "domain_motion_assets/reference/P0A8W0/6ON4_A.pdb": "874a47eaa5bffee5c74f151fbc4cbb064e19190e6f27fa299d27fbfdffaf9fa0",
+  "domain_motion_assets/reference/P0A8W0/6WFQ_A.pdb": "b881f5c1a0cf2b3fd2c9db6d56c2e656c7350f01436c05d7b739c5a4e3df7510",
+  "domain_motion_assets/reference/P0AEQ3/1GGG_A.pdb": "9d96247ea0251969a75de1cc5309bd4066d0b83d15cb087db208a4bdbb17f2cf",
+  "domain_motion_assets/reference/P0AEQ3/1WDN_A.pdb": "f895025be0c09c05fb26ea17722c3710a1c736e69c35f8246d65f06c400a7ed4",
+  "domain_motion_assets/reference/P0DP23/1CLL_A.pdb": "0b8f24280030653adb1687bc7ff959fec5c0f0f8ae82e5214addf012978b91c0",
+  "domain_motion_assets/reference/P0DP23/5GGM_A.pdb": "9dcfd70379d1bef7f7ba756b02f58019c3b73e251e2266a0f1b4c2e2757bdd9b",
+  "domain_motion_assets/reference/P23847/1DPE_A.pdb": "1b4c186011c53871f0f00817f52c383c7fc6d59e7bf4e21fb3711a4945025521",
+  "domain_motion_assets/reference/P23847/1DPP_A.pdb": "d79f07fae747899835077fa6c7bfca0d31fd25cdc7c8ed09e2a45f8628ccf168",
+  "domain_motion_assets/reference/P24182/1DV1_A.pdb": "3e3a3fbeda2d4a89c18e7c8f6cf893bd33e9e4e069b20202b4e2455dbd739f85",
+  "domain_motion_assets/reference/P24182/1DV2_A.pdb": "1bcbf693e14e01707b49ef3df608228df9012cb86fcbe3c3592b61c4ab1be021",
+  "domain_motion_assets/reference/P28366/1M74_A.pdb": "76393fe0625773c7472217169f4c794879b996db4170504267be6836c88e1adc",
+  "domain_motion_assets/reference/P28366/1TF2_A.pdb": "ee6463ae5e4a8641ac55c6858530fdcd2435ad0bcdb5a9972c0e75b6996372e4",
+  "domain_motion_assets/reference/P33284/3O80_A.pdb": "043824739b4599744c157fe6e822e1a63126671251efbb3bda5e25c5f49afda8",
+  "domain_motion_assets/reference/P33284/3O8M_A.pdb": "a7b4ec5cccb505473959cf2b67449453c11dab6315a2cf87db4a3f50c618a79e",
+  "domain_motion_assets/reference/P37487/1K23_C.pdb": "bee54c6a56943e1409e3b0a440c759e28ff659e148ef034999178e31271c2d71",
+  "domain_motion_assets/reference/P37487/1WPM_B.pdb": "e4bfec3d0a8344ba5b98708f27e0f51c742673adccb22fe5ee87792da128c426",
+  "domain_motion_assets/reference/P67701/6JQ4_A.pdb": "78822cf8cd99ae62d734b462414f4216533be031d568b4fec6a8d31f7b62f8ac",
+  "domain_motion_assets/reference/P67701/6KML_B.pdb": "dc787368f99cd77846a0656691fbc4b79cf73b3090c4744897e80572332f8385",
+  "domain_motion_assets/reference/P69441/1AKE_A.pdb": "f533f41e72b5a7890d570d9504794d7fec0b98778392fe784f2ca8e656572427",
+  "domain_motion_assets/reference/P69441/4AKE_A.pdb": "fc1b794284b45db7945de5385d8ff0261066e4f09c201db5c6be48d060a3eaab",
+  "domain_motion_assets/reference/P71447/2WF5_A.pdb": "3094ae96c339c92b5b81f418fc8feff29122b43a364128824d0fc5e1385955d8",
+  "domain_motion_assets/reference/P71447/2WFA_A.pdb": "b07a54c2446b3d60f37985d32d9edcf20da5b27bdfa603b8a1ee6e9b63aa64ee",
+  "domain_motion_assets/reference/Q18A65/6HNI_A.pdb": "669e7dd9864e479c884eec110504612a68d5b64b2f0a3a33634fcc031e1b659b",
+  "domain_motion_assets/reference/Q18A65/6HNK_A.pdb": "9b6ff8df972fe58d60c1b0834a821bee02d6f4519ef16c59147eb1add38b093c",
+  "domain_motion_assets/reference/Q5F9M1/2YLN_A.pdb": "14851fab7371433cc3e74346e9c427386dda26d1c59b3922e993549b3069e8a0",
+  "domain_motion_assets/reference/Q5F9M1/3ZSF_A.pdb": "e2b526b9ab7ed93b688e565e8f4453ed154877dbeba0dee552093f860403d083",
+  "domain_motion_assets/reference/Q83VS8/7E8R_A.pdb": "f0a64f9ec7ac854be6906e8fd7dcb93983bd7a82869d04321a0c62c562add5d1",
+  "domain_motion_assets/reference/Q83VS8/7EDB_A.pdb": "a5889769a4cb40d9bd2e486ee7b99e3bbd3a8127e2b16b079dd621f62db618a7",
+  "domain_motion_assets/references.csv": "c8925589fd7a513fb4aa63f31d7180fbf4ee620b2fdd7cb9e420b9e16a21b806",
+  "domain_motion_assets/testcases.csv": "103d621b008793e85f9ae23a6c48cd1333847b4b58c7bf8b89eb9ff6e91f98fa",
+  "domain_motion_split_record.json": "8c9fe970fa0486fc389218628993eba1e6e893c6fc003d0f26887c06be006016",
+  "pools/cryptic_benchmark.json": "0fdaa5dfd6389c7764ef598f42486dddb5a9eeb73dfbbfe37589a3d3a0ed1f8b",
+  "pools/cryptic_testsplit.json": "a5ebfacafe8a56cc5849f2880c5ce2d1d582b30ed73b530819296b9bc703a64b",
+  "pools/domain_motion.json": "6307f2cde90047e30265543ef2a19aee0ec5503e2c396ecd40a672dfd3d7e36b",
+  "pools/domain_motion_testsplit.json": "e5be64b4f851bdd84e968ff09bbc2791ee64fc4e5d6ecba6111600b06855e759",
+  "pools/kinase.json": "cfe7788fbce818fc417dec0a1cd1095b894d03661e64cc3f37125782ba2a92cf",
+  "references/cryptic_benchmark.pt": "ad79178e1b33695bd77c5db54cd32986106be794791cef650d2376128eb9c4c8",
+  "references/cryptic_testsplit.pt": "219a87b866b083c8b2ea11f13931f37221c41a5556b70c9bff5d1aab67d8e069",
+  "references/domain_motion_benchmark.pt": "07c9e2b31edb327e321aaf72f072f5e871c845f56a2f059956df1b59b74aca0b",
+  "references/domain_motion_testsplit.pt": "8a491740b6bc3d8fc5afee05adeb396db561c38626a6869e5887598cea92747d",
+  "references/kinase.pt": "8dabeafa79f2e0ef7af554a35ea2ac36c53161d255b410418b311d499d6ea17c",
+  "rosters/cryptic_structures.json": "fc24bd589a7e2c459c416a30db6caf8e5b51c475d6405e428016afaec8324ad9",
+  "rosters/cryptic_testsplit_apo_holo.json": "46155a9bb094badd9e96fde92cb14e6f3cdc9ee84c61fafd41a9e0dce562a0f5",
+  "rosters/cryptic_testsplit_systems.json": "e2adfe61178a5a505fe1639fee214acd6d0f1daf8bbd1ce69de18c30895a4984",
+  "rosters/domain_motion_canonical_labels.json": "b4e96e47e4c2a4c383c30ea1eb06cf94fa9a984bd1046480695e145865129b47",
+  "rosters/domain_motion_testsplit_systems.json": "b06ffa3c0c2ac2d56519161f49c53d0b0ea05e99c639f60d41c61e1d96746455"
+ }
+}

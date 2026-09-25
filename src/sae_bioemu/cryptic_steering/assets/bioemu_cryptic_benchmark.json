@@ -1,0 +1,244 @@
+{
+  "description": "BioEmu cryptic-pocket benchmark. Reused as the standard comparison set by ConforNets and ConforMix. Held out of training to keep that comparison honest.",
+  "source": "https://github.com/microsoft/bioemu-benchmarks (multiconf_benchmark_0.1/crypticpocket)",
+  "systems": {
+    "O74933": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "2YQC_A",
+        "2YQS_A"
+      ]
+    },
+    "P00766": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1AFQ_C",
+        "2CGA_B"
+      ]
+    },
+    "P02787": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1BP5_A",
+        "1RYO_A"
+      ]
+    },
+    "P08037": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1PZT_A",
+        "1PZY_D"
+      ]
+    },
+    "P08581": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1R1W_A",
+        "3F82_A"
+      ]
+    },
+    "P08709": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1JBU_A",
+        "1WUN_B"
+      ]
+    },
+    "P0A7D4": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1ADE_A",
+        "1CIB_A"
+      ]
+    },
+    "P0A7F3": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1ZA1_D",
+        "2AIR_D"
+      ]
+    },
+    "P0A8V6": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1E2X_A",
+        "1H9G_A"
+      ]
+    },
+    "P0AEX9": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1FQC_A",
+        "3PUW_A"
+      ]
+    },
+    "P0AG16": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1ECC_B",
+        "1ECJ_D"
+      ]
+    },
+    "P0DP23": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1CLL_A",
+        "1CTR_A"
+      ]
+    },
+    "P12758": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1K3F_B",
+        "1U1D_F"
+      ]
+    },
+    "P12823": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1OK8_A",
+        "1OKE_B"
+      ]
+    },
+    "P19491": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1FTL_A",
+        "1MY1_C"
+      ]
+    },
+    "P24182": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1BNC_B",
+        "2V5A_A"
+      ]
+    },
+    "P26281": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1HKA_A",
+        "3IP0_A"
+      ]
+    },
+    "P44542": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "2CEY_A",
+        "6H76_A"
+      ]
+    },
+    "P45568": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1K5H_C",
+        "2EGH_B"
+      ]
+    },
+    "P56817": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1W50_A",
+        "3IXJ_C"
+      ]
+    },
+    "P60338": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1EXM_A",
+        "1HA3_B"
+      ]
+    },
+    "P61586": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1OW3_B",
+        "1XCG_B"
+      ]
+    },
+    "P62593": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1JWP_A",
+        "1PZO_A"
+      ]
+    },
+    "P69441": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1ANK_B",
+        "4AKE_B"
+      ]
+    },
+    "P79345": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1NEP_A",
+        "2HKA_C"
+      ]
+    },
+    "P84080": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1RRG_A",
+        "1S9D_A"
+      ]
+    },
+    "P9WPY3": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "2IYQ_A",
+        "2IYT_A"
+      ]
+    },
+    "Q02763": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1FVR_A",
+        "2OO8_A"
+      ]
+    },
+    "Q16539": {
+      "has_pocket_definition": false,
+      "reference_structures": [
+        "2ZB1_A",
+        "3HL7_A"
+      ]
+    },
+    "Q16658": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "3P53_A",
+        "6I11_A"
+      ]
+    },
+    "Q27686": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1PKL_B",
+        "3HQP_P"
+      ]
+    },
+    "Q29495": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "1B6B_A",
+        "1KUV_A"
+      ]
+    },
+    "Q58L87": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "2V57_A",
+        "2WGB_A"
+      ]
+    },
+    "Q8WSF8": {
+      "has_pocket_definition": true,
+      "reference_structures": [
+        "2BYS_J",
+        "3PEO_G"
+      ]
+    }
+  }
+}

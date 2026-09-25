@@ -1,0 +1,932 @@
+{
+ "pairs": {
+  "1b0i_A": {
+   "holo_pdb_id": "1g9h",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1bfn_A": {
+   "holo_pdb_id": "1byb",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1f8a_B": {
+   "holo_pdb_id": "4tyo",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1g1q_B": {
+   "holo_pdb_id": "1g1s",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1jpm_A": {
+   "holo_pdb_id": "1tkk",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1k7k_A": {
+   "holo_pdb_id": "2q16",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1lju_A": {
+   "holo_pdb_id": "1rxe",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1lph_B": {
+   "holo_pdb_id": "3zu1",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1nd7_A": {
+   "holo_pdb_id": "8ei4",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1omx_A": {
+   "holo_pdb_id": "1omz",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1p9o_A": {
+   "holo_pdb_id": "7edz",
+   "holo_chain": "C",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1rf5_D": {
+   "holo_pdb_id": "1rf6",
+   "holo_chain": "C",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1rq2_B": {
+   "holo_pdb_id": "6ym1",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1uiu_A": {
+   "holo_pdb_id": "5on9",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1y1a_A": {
+   "holo_pdb_id": "1y1a",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1yl5_B": {
+   "holo_pdb_id": "5tjz",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1ywf_A": {
+   "holo_pdb_id": "2oz5",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "2bei_B": {
+   "holo_pdb_id": "2q4v",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "2ffy_A": {
+   "holo_pdb_id": "4kz8",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "2fpd_C": {
+   "holo_pdb_id": "7nym",
+   "holo_chain": "BBB",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "2gme_B": {
+   "holo_pdb_id": "2gnm",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3a0x_A": {
+   "holo_pdb_id": "3a0t",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3b49_A": {
+   "holo_pdb_id": "5x5m",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3brq_B": {
+   "holo_pdb_id": "3brq",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3cki_A": {
+   "holo_pdb_id": "3edz",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3dpc_B": {
+   "holo_pdb_id": "5c66",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3e9p_A": {
+   "holo_pdb_id": "7fmo",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3elx_A": {
+   "holo_pdb_id": "3elz",
+   "holo_chain": "C",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3fut_A": {
+   "holo_pdb_id": "3fuu",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3ijp_B": {
+   "holo_pdb_id": "3ijp",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3kd0_A": {
+   "holo_pdb_id": "3m9k",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3lo7_A": {
+   "holo_pdb_id": "3upp",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3m9j_A": {
+   "holo_pdb_id": "3m9k",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3mp4_D": {
+   "holo_pdb_id": "3mp5",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3qfa_D": {
+   "holo_pdb_id": "3m9k",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3r5s_A": {
+   "holo_pdb_id": "3r5t",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3s0z_A": {
+   "holo_pdb_id": "4gyu",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3u4m_A": {
+   "holo_pdb_id": "4f9t",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3u56_A": {
+   "holo_pdb_id": "1ad2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3umy_A": {
+   "holo_pdb_id": "1ad2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3w59_D": {
+   "holo_pdb_id": "5mwx",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "3zrz_A": {
+   "holo_pdb_id": "2rkz",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4cnf_B": {
+   "holo_pdb_id": "4cng",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4cxl_B": {
+   "holo_pdb_id": "4ajx",
+   "holo_chain": "D",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4e1y_A": {
+   "holo_pdb_id": "4f10",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4ei8_A": {
+   "holo_pdb_id": "4ei7",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4gf1_B": {
+   "holo_pdb_id": "4fxq",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4j4e_F": {
+   "holo_pdb_id": "2pys",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4m7p_A": {
+   "holo_pdb_id": "2iyf",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4njn_A": {
+   "holo_pdb_id": "2irv",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4nqv_F": {
+   "holo_pdb_id": "3myz",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4o7d_A": {
+   "holo_pdb_id": "3vp1",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4oo4_A": {
+   "holo_pdb_id": "3e3e",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4oo5_A": {
+   "holo_pdb_id": "3e3e",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4qg3_A": {
+   "holo_pdb_id": "1ad2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4qvi_A": {
+   "holo_pdb_id": "1ad2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4rjz_A": {
+   "holo_pdb_id": "4qsd",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4rvs_A": {
+   "holo_pdb_id": "4rvu",
+   "holo_chain": "D",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4x1o_A": {
+   "holo_pdb_id": "5bw4",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "4xbx_B": {
+   "holo_pdb_id": "4xdv",
+   "holo_chain": "C",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5cxg_D": {
+   "holo_pdb_id": "5aqc",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5ddt_B": {
+   "holo_pdb_id": "5hs2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5f12_A": {
+   "holo_pdb_id": "3b6j",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5f7q_C": {
+   "holo_pdb_id": "5f7r",
+   "holo_chain": "E",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5k7k_A": {
+   "holo_pdb_id": "7rl2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5mca_A": {
+   "holo_pdb_id": "4auy",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5mt7_A": {
+   "holo_pdb_id": "2irv",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5nch_B": {
+   "holo_pdb_id": "5nci",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5uky_B": {
+   "holo_pdb_id": "5ukv",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5wbm_B": {
+   "holo_pdb_id": "6ul7",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5wy2_A": {
+   "holo_pdb_id": "6n5x",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5xcw_X": {
+   "holo_pdb_id": "5dbe",
+   "holo_chain": "X",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5z6c_A": {
+   "holo_pdb_id": "5z6b",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "5ze7_B": {
+   "holo_pdb_id": "5zfk",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6b6i_B": {
+   "holo_pdb_id": "8u1w",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6cwm_A": {
+   "holo_pdb_id": "6cwn",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6hei_A": {
+   "holo_pdb_id": "7tuo",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6her_A": {
+   "holo_pdb_id": "4ma7",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6kmr_A": {
+   "holo_pdb_id": "9ohl",
+   "holo_chain": "D",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6n5y_A": {
+   "holo_pdb_id": "6n5x",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6nei_B": {
+   "holo_pdb_id": "6nej",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6nfk_A": {
+   "holo_pdb_id": "5sxg",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6nfl_A": {
+   "holo_pdb_id": "5cqh",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6of8_A": {
+   "holo_pdb_id": "9eoy",
+   "holo_chain": "C",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6ped_B": {
+   "holo_pdb_id": "9ohl",
+   "holo_chain": "D",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6q6j_A": {
+   "holo_pdb_id": "6hyj",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6q7q_A": {
+   "holo_pdb_id": "6q7r",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6u9c_A": {
+   "holo_pdb_id": "6pub",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "6x84_A": {
+   "holo_pdb_id": "4aq4",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7a32_D": {
+   "holo_pdb_id": "7a3a",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7a39_B": {
+   "holo_pdb_id": "7a34",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7bfo_A": {
+   "holo_pdb_id": "5ao9",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7bfu_A": {
+   "holo_pdb_id": "5aoa",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7clu_A": {
+   "holo_pdb_id": "7clf",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7cyr_A": {
+   "holo_pdb_id": "7cz2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7ery_A": {
+   "holo_pdb_id": "7es0",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7jxu_A": {
+   "holo_pdb_id": "5ko1",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7kql_T": {
+   "holo_pdb_id": "7m41",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7l5l_B": {
+   "holo_pdb_id": "6ubo",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7m2g_A": {
+   "holo_pdb_id": "1m48",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7ng2_A": {
+   "holo_pdb_id": "7nh2",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7nte_B": {
+   "holo_pdb_id": "7ntd",
+   "holo_chain": "AAA",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7o0j_A": {
+   "holo_pdb_id": "9etf",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7oap_EEE": {
+   "holo_pdb_id": "7d30",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7qni_AAA": {
+   "holo_pdb_id": "7r3d",
+   "holo_chain": "AAA",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "7vda_A": {
+   "holo_pdb_id": "6dhq",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "8i82_A": {
+   "holo_pdb_id": "8i80",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "8i84_B": {
+   "holo_pdb_id": "8i8h",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "8onn_E": {
+   "holo_pdb_id": "8aie",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "8sxw_A": {
+   "holo_pdb_id": "8syb",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "8vxu_B": {
+   "holo_pdb_id": "6wk9",
+   "holo_chain": "E",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "9cx8_A": {
+   "holo_pdb_id": "9cxw",
+   "holo_chain": "B",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "9dug_A": {
+   "holo_pdb_id": "8sbn",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "9eoy_A": {
+   "holo_pdb_id": "9eoy",
+   "holo_chain": "C",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "9f5v_A": {
+   "holo_pdb_id": "9f64",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "9h9x_A": {
+   "holo_pdb_id": "7xuq",
+   "holo_chain": "A",
+   "source": "json_export",
+   "match": "chain"
+  },
+  "1ald_A": {
+   "holo_pdb_id": "5tle",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 15
+  },
+  "2gq1_A": {
+   "holo_pdb_id": "2q8m",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 4
+  },
+  "2noo_A": {
+   "holo_pdb_id": "5on8",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 23
+  },
+  "2vu9_A": {
+   "holo_pdb_id": "8rvh",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "2vua_A": {
+   "holo_pdb_id": "8rvh",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "3fgp_B": {
+   "holo_pdb_id": "3dwg",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 6
+  },
+  "3zni_E": {
+   "holo_pdb_id": "8qtg",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 11
+  },
+  "4k7x_A": {
+   "holo_pdb_id": "4q60",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "5jlv_A": {
+   "holo_pdb_id": "8rvh",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "5k12_A": {
+   "holo_pdb_id": "6dhq",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 6
+  },
+  "5mk6_A": {
+   "holo_pdb_id": "8rvh",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "5o58_A": {
+   "holo_pdb_id": "5o70",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 5
+  },
+  "5onc_A": {
+   "holo_pdb_id": "4ubt",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 2
+  },
+  "5vcr_B": {
+   "holo_pdb_id": "5vcm",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 2
+  },
+  "6xtq_A": {
+   "holo_pdb_id": "5nyy",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 2
+  },
+  "7sir_A": {
+   "holo_pdb_id": "7ti7",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "7vyy_A": {
+   "holo_pdb_id": "7vz6",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  },
+  "8pak_A": {
+   "holo_pdb_id": "8pak",
+   "holo_chain": "A",
+   "source": "cryptobank_df",
+   "match": "chain:chain_id_apo",
+   "n_holo_candidates": 1
+  }
+ },
+ "unresolved": [],
+ "needs_fetch": [
+  "1ald_A",
+  "2noo_A",
+  "3zni_E",
+  "5o58_A",
+  "5vcr_B"
+ ],
+ "ambiguous": {
+  "1ald_A": [
+   "1ado",
+   "1zai",
+   "1zaj",
+   "2ot1",
+   "2qut",
+   "2quu",
+   "3bv4",
+   "3dfo",
+   "3dfs",
+   "3tu9",
+   "5tle",
+   "5tlh",
+   "5tlw",
+   "5tlz",
+   "6ald"
+  ],
+  "2gq1_A": [
+   "2owz",
+   "2ox3",
+   "2q8m",
+   "2qvr"
+  ],
+  "2noo_A": [
+   "1zlq",
+   "3dp8",
+   "3mvw",
+   "3mvx",
+   "3mvy",
+   "3mvz",
+   "3mw0",
+   "3mz9",
+   "3mzb",
+   "4dcx",
+   "4dcy",
+   "4i9d",
+   "5l8d",
+   "5mwu",
+   "5on0",
+   "5on1",
+   "5on4",
+   "5on5",
+   "5on8",
+   "5on9",
+   "6r4q",
+   "7a0c",
+   "8spm"
+  ],
+  "3fgp_B": [
+   "3dwg",
+   "5i6d",
+   "5i7a",
+   "5i7o",
+   "5i7r",
+   "5iw8"
+  ],
+  "3zni_E": [
+   "8gcy",
+   "8qng",
+   "8qnh",
+   "8qni",
+   "8qtg",
+   "8qth",
+   "8qtj",
+   "8qtk",
+   "9fqh",
+   "9fqi",
+   "9fqj"
+  ],
+  "5k12_A": [
+   "3etd",
+   "3etg",
+   "6dhd",
+   "6dhq",
+   "8ar7",
+   "8ar8"
+  ],
+  "5o58_A": [
+   "5o1u",
+   "5o25",
+   "5o4z",
+   "5o70",
+   "5o7f"
+  ],
+  "5onc_A": [
+   "4ubt",
+   "4ubv"
+  ],
+  "5vcr_B": [
+   "5vcm",
+   "5vcr"
+  ],
+  "6xtq_A": [
+   "5nxl",
+   "5nyy"
+  ]
+ }
+}

@@ -1,0 +1,55 @@
+{
+ "name": "sae_k32_time_layer_m1",
+ "what": "TopK sparse autoencoder over residue-level BioEmu denoiser hidden states. This is the base SAE: the k=32, time-conditioned, layer -1 ablation arm.",
+ "why_this_one": "It is the arm every downstream artifact binds to. configs/steering/abl1000u_cold.yaml, configs/steering/examples/train_rg_adapter.yaml and .../infer_rg_adapter.yaml all declare this checkpoint's SHA-256 as their `sae` source checkpoint, so it is the SAE that the shipped steering adapter models/rg_adapter_cold_v1.pt was trained against.",
+ "sha256": "311308f81fc2b378f2bff591993ca307e96ece47e79ac0543bf8b3214f6567c8",
+ "bytes": 17362034,
+ "source_config": "configs/ablations/k32_time_layer_m1.yaml",
+ "architecture": {
+  "class": "sae_bioemu.core.sae.TopKSAE",
+  "input_dim": 512,
+  "n_latents": 4096,
+  "top_k": 32,
+  "aux_k": 256,
+  "aux_k_coef": 0.03125,
+  "dead_tokens_threshold": 1000000,
+  "timestep_mlp_hidden_dim": 128,
+  "use_time_conditioning": true,
+  "normalize_inputs": true
+ },
+ "trace": {
+  "model_name": "bioemu-v1.1",
+  "target_module": "model_nn.st_module.encoder.layers.-1",
+  "denoiser_type": "dpm",
+  "recorded_score_calls": 10,
+  "samples_per_sequence": 32
+ },
+ "training": {
+  "activation_source": "bioemu",
+  "input_fasta": "data/splits/uniref50_interpro_train_1000.fasta",
+  "batch_size": 8192,
+  "epochs": 1,
+  "learning_rate": 0.0001,
+  "lr_scheduler": "linear",
+  "lr_warmup_steps": 300,
+  "min_learning_rate": 3e-05,
+  "weight_decay": 0.0,
+  "seed": 0,
+  "mixed_precision": true
+ },
+ "evaluation": {
+  "evaluation_input_fasta": "data/splits/uniref50_interpro_eval_1000.fasta",
+  "interpro_annotations_path": "data/splits/interpro_eval_1000.jsonl",
+  "evaluation_samples_per_sequence": 32,
+  "sequence_grouped_folds": true,
+  "note": "Concept ranking uses cross-validated f1_per_domain with sequence-grouped folds. Coverage floors are 100 positive residues, 10 positive domain instances and 10 positive sequences."
+ },
+ "provenance_notes": [
+  "The bytes here are identical to outputs/ablations_interpro/k32_time_layer_m1/sae.pt as produced by the original run; only the location differs. Nothing in the fingerprinting machinery records a checkpoint PATH -- _source_hashes in bioemu/steering_workflow.py compares digests -- so shipping a copy at this path moves no fingerprint.",
+  "The training split in data/splits/ is the exact split this checkpoint was trained on. It is committed because re-deriving it does not reproduce it: the UniRef50 release is unpinned upstream and InterPro is queried live. See docs/DATA_PROVENANCE.md.",
+  "The absolute `evaluation_activation_archive` path in configs/ablations/k32_time_layer_m1.yaml is deliberately left as-is: that file's bytes are SHA-256'd into run identity and compared against stored provenance, so editing it would invalidate published artifacts."
+ ],
+ "caveats": [
+  "Optimizer, scaler and scheduler states are removed for release; the weights are bit-identical to the trained checkpoint and the forward pass reproduces it exactly."
+ ]
+}

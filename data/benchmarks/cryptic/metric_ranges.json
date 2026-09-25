@@ -1,0 +1,880 @@
+{
+  "description": "metric_resid_ranges and alignment_resid_ranges for the BioEmu cryptic-pocket benchmark, copied verbatim from bioemu-benchmarks. Residue numbers index the benchmark's OWN processed reference PDBs, which its README warns may be numbered differently from the deposited entries. n_residues is the test case sequence length from testcases.csv, which is what the upstream evaluator uses to expand an open-ended range.",
+  "ligand_radius_used_for_derived_pockets": 4.5,
+  "source": "https://github.com/microsoft/bioemu-benchmarks (bioemu_benchmarks/assets/multiconf_benchmark_0.1/crypticpocket/local_residinfo)",
+  "systems": {
+    "O74933": {
+      "alignment_resid_ranges": [
+        [
+          105,
+          120
+        ],
+        [
+          280,
+          330
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.13786008230452676,
+      "metric_resid_ranges": [
+        [
+          105,
+          120
+        ],
+        [
+          280,
+          330
+        ]
+      ],
+      "metric_residues": 67,
+      "n_residues": 486,
+      "sha256": "c8a2f6d27f788aace28395d7c29f6cb72a6bd0234390b6e845afd8d78d6511a5"
+    },
+    "P00766": {
+      "alignment_resid_ranges": [
+        [
+          184,
+          198
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.061224489795918366,
+      "metric_resid_ranges": [
+        [
+          184,
+          198
+        ]
+      ],
+      "metric_residues": 15,
+      "n_residues": 245,
+      "sha256": "7b7c39272a4f84bcb938dfee254b166962474ee228c02961a4597d10f075f8de"
+    },
+    "P02787": {
+      "alignment_resid_ranges": [
+        [
+          1,
+          324
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.9614243323442137,
+      "metric_resid_ranges": [
+        [
+          1,
+          324
+        ]
+      ],
+      "metric_residues": 324,
+      "n_residues": 337,
+      "sha256": "97b9c625c67c1ba7be24dceca5e3fe7d7a30f1b0b9fa221fb216509fe939fc0c"
+    },
+    "P08037": {
+      "alignment_resid_ranges": [
+        [
+          186,
+          242
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.1993006993006993,
+      "metric_resid_ranges": [
+        [
+          186,
+          242
+        ]
+      ],
+      "metric_residues": 57,
+      "n_residues": 286,
+      "sha256": "6d4ab658f644c70d99b097bb3a6b0c82581ef20392c2d7c921d37de0b1938c82"
+    },
+    "P08581": {
+      "alignment_resid_ranges": [
+        [
+          1,
+          84
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.2692307692307692,
+      "metric_resid_ranges": [
+        [
+          1,
+          84
+        ]
+      ],
+      "metric_residues": 84,
+      "n_residues": 312,
+      "sha256": "1255fe9c277a52e95ea5a3f0571f9ff235e24840f7dd2382d88fb9d0a55bb618"
+    },
+    "P08709": {
+      "alignment_resid_ranges": [
+        [
+          40,
+          45
+        ],
+        [
+          81,
+          90
+        ],
+        [
+          155,
+          192
+        ],
+        [
+          210,
+          218
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.24803149606299213,
+      "metric_resid_ranges": [
+        [
+          40,
+          45
+        ],
+        [
+          81,
+          90
+        ],
+        [
+          155,
+          192
+        ],
+        [
+          210,
+          218
+        ]
+      ],
+      "metric_residues": 63,
+      "n_residues": 254,
+      "sha256": "b76db42775965bbf9de080ad54a957671dde011db5ecae5c398d83c444d4a0ab"
+    },
+    "P0A7D4": {
+      "alignment_resid_ranges": [
+        [
+          12,
+          20
+        ],
+        [
+          36,
+          53
+        ],
+        [
+          106,
+          130
+        ],
+        [
+          270,
+          309
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.21345707656612528,
+      "metric_resid_ranges": [
+        [
+          12,
+          20
+        ],
+        [
+          36,
+          53
+        ],
+        [
+          106,
+          130
+        ],
+        [
+          270,
+          309
+        ]
+      ],
+      "metric_residues": 92,
+      "n_residues": 431,
+      "sha256": "6aba68e06e33d9ae4cb384eb927b9bf3d182af782977bff4686a8b11da9178be"
+    },
+    "P0A7F3": {
+      "alignment_resid_ranges": [
+        [
+          68,
+          98
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.20261437908496732,
+      "metric_resid_ranges": [
+        [
+          68,
+          98
+        ]
+      ],
+      "metric_residues": 31,
+      "n_residues": 153,
+      "sha256": "376525ba08861c78313806ea44e0989c4701543332ce8ad6d11bff9a1a693f78"
+    },
+    "P0A8V6": {
+      "alignment_resid_ranges": [
+        [
+          40,
+          130
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.37448559670781895,
+      "metric_resid_ranges": [
+        [
+          40,
+          130
+        ]
+      ],
+      "metric_residues": 91,
+      "n_residues": 243,
+      "sha256": "00e70ae714f8aeb668bab6c826b2c035860fc383455870ef480de2e5e52089e9"
+    },
+    "P0AEX9": {
+      "alignment_resid_ranges": [
+        [
+          1,
+          74
+        ],
+        [
+          186,
+          240
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.3412698412698413,
+      "metric_resid_ranges": [
+        [
+          1,
+          74
+        ],
+        [
+          186,
+          240
+        ]
+      ],
+      "metric_residues": 129,
+      "n_residues": 378,
+      "sha256": "c31db4f2cff7b12eed8c89a4a46d84c6c3e640326b26722725188dc81ab314dd"
+    },
+    "P0AG16": {
+      "alignment_resid_ranges": [
+        [
+          323,
+          358
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.07142857142857142,
+      "metric_resid_ranges": [
+        [
+          323,
+          358
+        ]
+      ],
+      "metric_residues": 36,
+      "n_residues": 504,
+      "sha256": "2211c7ef0a637ab8cbc70a4fd2c6454f1733056ed274c8bfee5068b4801b4c1c"
+    },
+    "P0DP23": {
+      "alignment_resid_ranges": [
+        [
+          1,
+          147
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.9932432432432432,
+      "metric_resid_ranges": [
+        [
+          1,
+          147
+        ]
+      ],
+      "metric_residues": 147,
+      "n_residues": 148,
+      "sha256": "29d7e9e9f0520d6f3668cddd694b3ec042acaa02ca9eb3e1812e2549205ef706"
+    },
+    "P12758": {
+      "alignment_resid_ranges": [
+        [
+          161,
+          190
+        ],
+        [
+          224,
+          240
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.1857707509881423,
+      "metric_resid_ranges": [
+        [
+          161,
+          190
+        ],
+        [
+          224,
+          240
+        ]
+      ],
+      "metric_residues": 47,
+      "n_residues": 253,
+      "sha256": "f90495375a7ef143dc97fdce508b75f12be24a098760d43a64e29dff7d9c9454"
+    },
+    "P12823": {
+      "alignment_resid_ranges": [
+        [
+          1,
+          55
+        ],
+        [
+          130,
+          394
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.8121827411167513,
+      "metric_resid_ranges": [
+        [
+          1,
+          55
+        ],
+        [
+          130,
+          394
+        ]
+      ],
+      "metric_residues": 320,
+      "n_residues": 394,
+      "sha256": "24c80fd763f70e385f8b21b8ca8844f96627818446728252aca1450d62fe8a1d"
+    },
+    "P19491": {
+      "alignment_resid_ranges": [
+        [
+          10,
+          13
+        ],
+        [
+          55,
+          96
+        ],
+        [
+          135,
+          182
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.3574144486692015,
+      "metric_resid_ranges": [
+        [
+          10,
+          13
+        ],
+        [
+          55,
+          96
+        ],
+        [
+          135,
+          182
+        ]
+      ],
+      "metric_residues": 94,
+      "n_residues": 263,
+      "sha256": "4e698d135a8f90f3737c2de46231c4989d3eefb0d959e08c002fcdc9c4c6f9b6"
+    },
+    "P24182": {
+      "alignment_resid_ranges": [
+        [
+          88,
+          217
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.289532293986637,
+      "metric_resid_ranges": [
+        [
+          88,
+          217
+        ]
+      ],
+      "metric_residues": 130,
+      "n_residues": 449,
+      "sha256": "6539bfdc9a48e9de6851219aca08c7b7dc7f906eb2482502482d3ef73057702d"
+    },
+    "P26281": {
+      "alignment_resid_ranges": [
+        [
+          44,
+          52
+        ],
+        [
+          84,
+          92
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.11392405063291139,
+      "metric_resid_ranges": [
+        [
+          44,
+          52
+        ],
+        [
+          84,
+          92
+        ]
+      ],
+      "metric_residues": 18,
+      "n_residues": 158,
+      "sha256": "8ef766b874db571004e76726dee5d47e39eab816626560ae87083ee6f655d96a"
+    },
+    "P44542": {
+      "alignment_resid_ranges": [
+        [
+          0,
+          65
+        ],
+        [
+          133,
+          202
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.4444444444444444,
+      "metric_resid_ranges": [
+        [
+          0,
+          65
+        ],
+        [
+          133,
+          202
+        ]
+      ],
+      "metric_residues": 136,
+      "n_residues": 306,
+      "sha256": "4ddb7136510bff94536f3a2b9256c1fd24e216debc59bcb2dc30e3a2e865f039"
+    },
+    "P45568": {
+      "alignment_resid_ranges": [
+        [
+          202,
+          225
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.06030150753768844,
+      "metric_resid_ranges": [
+        [
+          202,
+          225
+        ]
+      ],
+      "metric_residues": 24,
+      "n_residues": 398,
+      "sha256": "4f2e70a40c09b0db52ec8f2a83f0a2987f6b079147538d25bc9b9c3301c89e02"
+    },
+    "P56817": {
+      "alignment_resid_ranges": [
+        [
+          70,
+          80
+        ],
+        [
+          220,
+          228
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.04866180048661801,
+      "metric_resid_ranges": [
+        [
+          70,
+          80
+        ],
+        [
+          220,
+          228
+        ]
+      ],
+      "metric_residues": 20,
+      "n_residues": 411,
+      "sha256": "49863f75746f0114414f948c927b143cae27529a0bd2a8044d84b608add36413"
+    },
+    "P60338": {
+      "alignment_resid_ranges": [
+        [
+          107,
+          171
+        ],
+        [
+          309,
+          403
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.3950617283950617,
+      "metric_resid_ranges": [
+        [
+          107,
+          171
+        ],
+        [
+          309,
+          403
+        ]
+      ],
+      "metric_residues": 160,
+      "n_residues": 405,
+      "sha256": "cbb9d5f7edd03fe166edf735b4402259e2d3deb8c090e19805098604f39c0a21"
+    },
+    "P61586": {
+      "alignment_resid_ranges": [
+        [
+          12,
+          48
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.20786516853932585,
+      "metric_resid_ranges": [
+        [
+          12,
+          48
+        ]
+      ],
+      "metric_residues": 37,
+      "n_residues": 178,
+      "sha256": "d194e92b09ac27d6aac017c1c77724174bf623c3f7688b41ab53589026b8c1af"
+    },
+    "P62593": {
+      "alignment_resid_ranges": [
+        [
+          190,
+          200
+        ],
+        [
+          244,
+          263
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.11787072243346007,
+      "metric_resid_ranges": [
+        [
+          190,
+          200
+        ],
+        [
+          244,
+          263
+        ]
+      ],
+      "metric_residues": 31,
+      "n_residues": 263,
+      "sha256": "d9399d9fff881790d3002d4f4897129386764215111c6a33f2da71ccb9e0a03b"
+    },
+    "P69441": {
+      "alignment_resid_ranges": [
+        [
+          104,
+          198
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.4439252336448598,
+      "metric_resid_ranges": [
+        [
+          104,
+          198
+        ]
+      ],
+      "metric_residues": 95,
+      "n_residues": 214,
+      "sha256": "7b449892b81352f4c9070bb1ab8c3294c2487f9240267ac5780615e80be86e6e"
+    },
+    "P79345": {
+      "alignment_resid_ranges": [
+        [
+          91,
+          105
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.11538461538461539,
+      "metric_resid_ranges": [
+        [
+          91,
+          105
+        ]
+      ],
+      "metric_residues": 15,
+      "n_residues": 130,
+      "sha256": "307f7032d20b44d9e7d72edb7371d58b9e8c57af0f5a37eab3e34ce71aac3bac"
+    },
+    "P84080": {
+      "alignment_resid_ranges": [
+        [
+          39,
+          83
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.24861878453038674,
+      "metric_resid_ranges": [
+        [
+          39,
+          83
+        ]
+      ],
+      "metric_residues": 45,
+      "n_residues": 181,
+      "sha256": "2e81452d290c2f5b6eaff08479524a7ea425bfd0ad236c7ca3149894b46f647f"
+    },
+    "P9WPY3": {
+      "alignment_resid_ranges": [
+        [
+          100,
+          140
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.22282608695652173,
+      "metric_resid_ranges": [
+        [
+          100,
+          140
+        ]
+      ],
+      "metric_residues": 41,
+      "n_residues": 184,
+      "sha256": "b8383b33fad5cac4af1a1fabebf56a62db3989a739dbcfd6cb54fcf95225e0a2"
+    },
+    "Q02763": {
+      "alignment_resid_ranges": [
+        [
+          10,
+          33
+        ],
+        [
+          164,
+          181
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.12844036697247707,
+      "metric_resid_ranges": [
+        [
+          10,
+          33
+        ],
+        [
+          164,
+          181
+        ]
+      ],
+      "metric_residues": 42,
+      "n_residues": 327,
+      "sha256": "605c7efe2ac648c361a7e7f4bd0da50259a948fbeb17c045e77507dc78bb3d68"
+    },
+    "Q16539": {
+      "has_upstream_file": false,
+      "n_residues": 360,
+      "note": "no local_residinfo file upstream; ranges are NOT recoverable and are deliberately left absent rather than synthesised"
+    },
+    "Q16658": {
+      "alignment_resid_ranges": [
+        [
+          3,
+          43
+        ],
+        [
+          53,
+          76
+        ],
+        [
+          83,
+          149
+        ],
+        [
+          156,
+          236
+        ],
+        [
+          243,
+          252
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.4495967741935484,
+      "metric_resid_ranges": [
+        [
+          3,
+          43
+        ],
+        [
+          53,
+          76
+        ],
+        [
+          83,
+          149
+        ],
+        [
+          156,
+          236
+        ],
+        [
+          243,
+          252
+        ]
+      ],
+      "metric_residues": 223,
+      "n_residues": 496,
+      "sha256": "9630378840730ff3184069917673a812321630dfe5973feefd40ecf1b8537576"
+    },
+    "Q27686": {
+      "alignment_resid_ranges": [
+        [
+          22,
+          178
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.31462925851703405,
+      "metric_resid_ranges": [
+        [
+          22,
+          178
+        ]
+      ],
+      "metric_residues": 157,
+      "n_residues": 499,
+      "sha256": "10ac42084df929022599314d4b0c3ee132619b7b39b47f1c45d909478c91900c"
+    },
+    "Q29495": {
+      "alignment_resid_ranges": [
+        [
+          11,
+          48
+        ],
+        [
+          99,
+          104
+        ],
+        [
+          132,
+          142
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.3160919540229885,
+      "metric_resid_ranges": [
+        [
+          11,
+          48
+        ],
+        [
+          99,
+          104
+        ],
+        [
+          132,
+          142
+        ]
+      ],
+      "metric_residues": 55,
+      "n_residues": 174,
+      "sha256": "d0b396dc1cbcf6c237635d8c7ad2ae78f05ffc7b2588bb43cedcdf072c700f12"
+    },
+    "Q58L87": {
+      "alignment_resid_ranges": [
+        [
+          1,
+          47
+        ],
+        [
+          93,
+          130
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.4473684210526316,
+      "metric_resid_ranges": [
+        [
+          1,
+          47
+        ],
+        [
+          93,
+          130
+        ]
+      ],
+      "metric_residues": 85,
+      "n_residues": 190,
+      "sha256": "8702009cca023229177a1b4eccdd7b49c6398e2732896187120992ac30e6607a"
+    },
+    "Q8WSF8": {
+      "alignment_resid_ranges": [
+        [
+          142,
+          148
+        ],
+        [
+          182,
+          198
+        ]
+      ],
+      "has_upstream_file": true,
+      "is_whole_chain": false,
+      "metric_fraction_of_chain": 0.10526315789473684,
+      "metric_resid_ranges": [
+        [
+          142,
+          148
+        ],
+        [
+          182,
+          198
+        ]
+      ],
+      "metric_residues": 24,
+      "n_residues": 228,
+      "sha256": "d3bd132a1865fee9b21cc435d99d7249833d1b159dbf7fc9baf20a9bd2ebd803"
+    }
+  }
+}

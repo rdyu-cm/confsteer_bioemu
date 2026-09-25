@@ -1,0 +1,52 @@
+sae:
+  input_dim: 512
+  n_latents: 4096
+  top_k: 32
+  aux_k: 256
+  aux_k_coef: 0.03125
+  dead_tokens_threshold: 1000000
+  timestep_mlp_hidden_dim: 128
+  use_time_conditioning: true
+  normalize_inputs: true
+trace:
+  model_name: bioemu-v1.1
+  target_module: model_nn.st_module.encoder.layers.-1
+  denoiser_type: dpm
+  denoiser_config_path:
+  cache_so3_dir: data/processed/so3_cache
+  recorded_score_calls: 10
+  samples_per_sequence: 32
+  save_final_structures: true
+  final_structures_subdir: final_structures
+training:
+  activation_source: bioemu
+  input_fasta: data/processed/uniref50_interpro_train_1000.fasta
+  cache_embeds_dir: data/processed/embeds_cache_interpro_train_1000
+  runtime_structure_dir: activation_stores/bioemu_interpro_train_1000_runtime_structures
+  runtime_sequence_batch_size: 1
+  runtime_activation_buffer_size: 32768
+  output_dir: outputs/default_interpro_1000
+  batch_size: 8192
+  epochs: 1
+  learning_rate: 0.0001
+  lr_scheduler: linear
+  lr_warmup_steps: 300
+  min_learning_rate: 0.00003
+  weight_decay: 0.0
+  metrics_interval: 50
+  seed: 0
+  device: auto
+  mixed_precision: true
+uniref50:
+  num_clusters: 1000
+  max_sequence_length: 300
+  seed: 0
+analysis:
+  interpro_annotations_path: data/processed/interpro_eval_1000.jsonl
+  evaluation_input_fasta: data/processed/uniref50_interpro_eval_1000.fasta
+  evaluation_cache_embeds_dir: data/processed/embeds_cache_interpro_eval_1000
+  evaluation_structure_dir: activation_stores/bioemu_interpro_eval_1000_runtime_structures
+  evaluation_samples_per_sequence: 32
+  concept_min_positive_residues: 100
+  concept_min_positive_domains: 10
+  concept_min_positive_sequences: 10

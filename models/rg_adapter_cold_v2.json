@@ -1,0 +1,105 @@
+{
+ "name": "rg_adapter_cold_v2",
+ "what": "Bounded-residual MLP adapter steering BioEmu radius of gyration at one denoiser score call, trained at k = 1.",
+ "why_this_one": "The cold arm at the paper's operating point: no direction prior at all, requesting a full sigma per unit level instead of half. k = 1 delivers twice the physical shift of v1 for no measurable loss of calibration quality (paired difference against k = 0.5: -4.62 points, CI [-9.61, +0.31], p = 0.069).",
+ "sha256": "25b68c8b6397055130334baa53216239205b6feeb807fe62d926094fd9a25591",
+ "bytes": 3086456,
+ "architecture": {
+  "width": 512,
+  "input_width": 1024,
+  "hidden_width": 64,
+  "hidden_layers": 2,
+  "rho_max": 0.1,
+  "level_conditioning": "branch",
+  "eps": 1e-08,
+  "class": "sae_bioemu.steering.adapter.BoundedResidualAdapter"
+ },
+ "warm_start_direction_fingerprint": null,
+ "training": {
+  "source_config": "configs/steering/abl1000u_cold_k1.yaml",
+  "split": {
+   "train": 700,
+   "validation": 100,
+   "held_out": 200,
+   "disjoint_by_sequence": true
+  },
+  "training_seed": 0,
+  "dose_multiplier_k": 1.0,
+  "target_levels": [
+   -1.0,
+   -0.5,
+   0.0,
+   0.5,
+   1.0
+  ],
+  "sigma_eligibility": {
+   "lower": 0.001,
+   "upper": 1000.0
+  },
+  "objective": {
+   "lambda_y": 0.01,
+   "lambda_r": 0.0,
+   "lambda_g": 0.01,
+   "lambda_c": 1.0,
+   "lambda_l": 0.0
+  },
+  "schedule_seed_fingerprint": "3e2618657735dc5785b776978a1542c8696f381e7aa9e25b2fd6b0c3b2596820",
+  "property_reference": {
+   "file_sha256": "9fe21544970a9c6caf42b5e2820b28ea7845609ae90df5ed2cf66fda99e4c6bd",
+   "content_fingerprint": "75948a4b11e86db9aa34221453dadbb3de826901b94cece6bc258ede69dc34ee",
+   "sequence_count": 1000
+  },
+  "intervention_site": {
+   "absolute_score_call_zero_based": 11,
+   "analysis_call_ordinal": 1,
+   "capture_index_one_based": 12,
+   "denoiser_iteration": 5,
+   "denoiser_role": "corrector",
+   "expected_score_call_total": 98,
+   "max_timestep_distance": 0.06,
+   "module_path": "model_nn.st_module.encoder.layers.-1",
+   "provenance": "no_manifest_exploratory",
+   "requested_layer": "-1",
+   "requested_timestep": 0.87939,
+   "resolved_timestep": 0.8793912588226854,
+   "score_calls": [
+    11
+   ],
+   "timestep_tolerance": 0.0001
+  }
+ },
+ "held_out_results": {
+  "unfiltered_200_sequences": {
+   "percent_of_k": 109.9,
+   "ci": [
+    1.0266,
+    1.178
+   ],
+   "compress_slope": 0.9996,
+   "expand_slope": 1.0709,
+   "bond_in_window_pct": 91.18,
+   "clashes_total": 4873,
+   "lddt_ca": 0.9157,
+   "control_bond_in_window_pct": 91.83,
+   "control_clashes_total": 4180,
+   "ensemble_lddt_floor": 0.746
+  }
+ },
+ "ablations_at_this_operating_point": {
+  "note": "Each is a strict one-line change from this configuration, paired against it on shared noise draws. Full tables in docs/steering/FINDINGS.md.",
+  "level_conditioning_concat": "-1.0% of k -- a cold-started concat adapter does not learn a dose response at all",
+  "injection_site_ordinal_9": "89.6% of k but 17.11% of bonds in window against a 91.83% control, and fold metrics below the ensemble floor",
+  "lambda_c_0": "64.5% of k, and the compress/expand ratio falls to 0.79",
+  "lambda_g_0": "94.0% of k, null on both structure metrics -- the geometry penalty is inert at this site and dose",
+  "warm_start_rank_one": "95.0% of k"
+ },
+ "caveats": [
+  "Descriptive/predictive, not causal.",
+  "BioEmu approximates an equilibrium ensemble; do not infer free energies from steered samples.",
+  "Trained and evaluated on proteins of intermediate flexibility; behaviour outside that is untested.",
+  "One training run at one seed. Intervals are sequence-grouped bootstraps over held-out proteins and do not capture run-to-run training variance, which is unmeasured for this family.",
+  "This arm OVERSHOOTS: its held-out interval [1.0266, 1.1780] excludes k. The warm-started ablation reaches 95.0% with an interval that contains k, so on this single split the direction prior is the better-calibrated arm. Cold is shipped on the robustness argument established at k = 0.5 -- it was the only arm whose interval contained k on BOTH the filtered and unfiltered evaluation splits, while the warm arm swung 15.5 points and flipped from undershoot to overshoot between them. That two-split comparison has NOT been repeated at k = 1.",
+  "Compression saturates near 1.1 sigma. At k = 1 that ceiling is already reached, so requesting more compression than one sigma per level will not deliver it; expansion shows no ceiling within the range tested.",
+  "optimizer_state is emptied for release; adapter weights are bit-identical to the trained checkpoint."
+ ]
+}
